@@ -3,6 +3,10 @@
 using Helpers;
 
 namespace Weapons {
+    /// <summary>
+    /// Weapon that fires a beam forward.
+    /// </summary>
+    [AddComponentMenu("Weapons / Laser")]
     public class Laser : WeaponBase {
         protected override void Setup() {
             _Kind = WeaponKinds.Laser;

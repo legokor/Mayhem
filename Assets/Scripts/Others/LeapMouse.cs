@@ -2,6 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+[AddComponentMenu("Others / Leap Mouse")]
 public class LeapMouse : Singleton<LeapMouse> {
     [Tooltip("Cursor texture.")]
     public Texture MouseIcon;

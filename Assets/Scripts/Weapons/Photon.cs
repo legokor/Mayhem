@@ -3,6 +3,10 @@
 using Helpers;
 
 namespace Weapons {
+    /// <summary>
+    /// Weapon that shoots projectiles forward.
+    /// </summary>
+    [AddComponentMenu("Weapons / Photon")]
     public class Photon : WeaponBase {
         protected override void Setup() {
             _Kind = WeaponKinds.Photon;

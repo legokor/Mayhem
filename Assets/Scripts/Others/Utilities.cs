@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Some helpers that doesn't fit anywhere.
+/// </summary>
 public static class Utilities {
     public static Quaternion ForwardRot = Quaternion.Euler(0, 0, 0), Backwards = Quaternion.Euler(0, 180, 0);
 

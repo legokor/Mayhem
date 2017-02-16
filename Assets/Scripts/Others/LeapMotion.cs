@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Leap Motion handling simplified.
 /// </summary>
+[AddComponentMenu("Others / Leap Motion")]
 public class LeapMotion : Singleton<LeapMotion> {
     [Tooltip("Bottom of hand detection bounds when used in 2D.")]
     public Vector2 LeapLowerBounds = new Vector2(-200, -112.5f);

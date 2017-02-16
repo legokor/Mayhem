@@ -4,6 +4,7 @@ namespace Destructors {
     /// <summary>
     /// Destroy the object when it leaves the screen.
     /// </summary>
+    [AddComponentMenu("Destructors / Out of Screen Despawner")]
     public class OutOfScreenDespawner : MonoBehaviour {
         void Update() {
             Vector3 PositionOnScreen = Camera.main.WorldToViewportPoint(transform.position);

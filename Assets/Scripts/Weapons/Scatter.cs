@@ -3,6 +3,10 @@
 using Helpers;
 
 namespace Weapons {
+    /// <summary>
+    /// Weapon that shoots projectiles in an angle.
+    /// </summary>
+    [AddComponentMenu("Weapons / Scatter")]
     public class Scatter : WeaponBase {
         protected override void Setup() {
             _Kind = WeaponKinds.Scatter;

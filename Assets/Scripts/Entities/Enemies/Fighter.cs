@@ -3,6 +3,10 @@
 using Helpers;
 
 namespace Enemies {
+    /// <summary>
+    /// Fighter - flies and shoots straight.
+    /// </summary>
+    [AddComponentMenu("Enemies / Fighter")]
     public class Fighter : EnemyBase {
         public float NoseOffset = 10f;
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 namespace Menus {
+    [AddComponentMenu("Menus / Calibration")]
     class Calibration : Singleton<Calibration> {
         [Tooltip("Position in the world representing the controller.")]
         public Transform VisualizationFloor;

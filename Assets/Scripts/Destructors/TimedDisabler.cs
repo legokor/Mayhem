@@ -4,6 +4,7 @@ namespace Destructors {
     /// <summary>
     /// Disables the object after a set time.
     /// </summary>
+    [AddComponentMenu("Destructors / Timed Disabler")]
     public class TimedDisabler : MonoBehaviour {
         public float Timer = 3;
 

@@ -4,6 +4,10 @@ using Helpers;
 using Weapons;
 
 namespace Enemies {
+    /// <summary>
+    /// Drone - rotates, moves in a wave, and shoots at the player.
+    /// </summary>
+    [AddComponentMenu("Enemies / Drone")]
     public class Drone : EnemyBase {
         public float RotationSpeed = 180f;
         public float ShakeIntensity = 5f;

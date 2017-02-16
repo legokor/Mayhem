@@ -9,6 +9,7 @@ using Destructors;
 using Helpers;
 
 namespace Menus {
+    [AddComponentMenu("Menus / Main Menu")]
     public class MainMenu : MonoBehaviour {
         [Tooltip("Button click sound.")]
         public AudioClip SelectSound;

@@ -4,6 +4,7 @@ namespace Destructors {
     /// <summary>
     /// Destroy the object after a set time.
     /// </summary>
+    [AddComponentMenu("Destructors / Timed Despawner")]
     public class TimedDespawner : MonoBehaviour {
         public float Timer = 3;
 
