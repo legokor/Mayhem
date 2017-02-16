@@ -1,0 +1,12 @@
+.vs/
+Library/
+Temp/
+*.meta
+Assets/SDK/LeapCSharp.NET3.5.dll
+Assets/SDK/x86/LeapC.dll
+Assets/SDK/x86_64/LeapC.dll
+Assets/Music/
+Mayhem.Editor.csproj
+Mayhem.Plugins.csproj
+Mayhem.csproj
+Mayhem.sln
