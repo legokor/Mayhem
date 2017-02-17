@@ -18,10 +18,10 @@ namespace Weapons {
     public abstract class WeaponBase : MonoBehaviour {
         [Tooltip("Weapon level.")]
         [Range(1, 5)]
-        public int Level;
+        public int Level = 1;
         [Tooltip("Experience points for the current level.")]
         [Range(0, 25)]
-        public int XP;
+        public int XP = 0;
         [Tooltip("Is it firing?")]
         public bool Firing = false;
 

@@ -5,6 +5,7 @@ using Cavern;
 
 using Helpers;
 using Menus;
+using Pickups;
 using Weapons;
 
 [AddComponentMenu("Entities / Player")]
@@ -12,7 +13,7 @@ public class PlayerEntity : Singleton<PlayerEntity> {
     [Header("Resources")]
     [Tooltip("Experience drop.")]
     public GameObject XPPickupObject;
-    public AudioClip AudioPhoton, AudioScatter, AudioBeam, AudioPhotonPickup, AudioScatterPickup, AudioLaserPickup, AudioXPPickup;
+    public AudioClip AudioPhoton, AudioScatter, AudioBeam;
 	public GameObject ProjectileEntity, BeamEntity, PlayerBody, DeathEffect;
     [Header("Settings")]
     [Tooltip("Don't drag the player entity as fast as the user moves their hand.")]
@@ -38,11 +39,16 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         this.Score += Score;
     }
 
+    public void AwardExperience() {
+        Weapon.AddExperience();
+        Score += 25;
+    }
+
 	public void PlaySound(AudioClip Sound, float Volume = 1) {
 		Source.PlayOneShot(Sound, Volume);
 	}
 
-	void OnPickedUpWeapon(WeaponKinds Kind) {
+	public void WeaponPickup(WeaponKinds Kind) {
 		if (Weapon.Kind != Kind) {
             // Set new weapon
             int Level = Math.Max(1, Weapon.Level - 1);
@@ -65,17 +71,11 @@ public class PlayerEntity : Singleton<PlayerEntity> {
 	}
 
 	void OnTriggerEnter(Collider col) {
-		if (col.gameObject.name.StartsWith("GreenPickup")) {
-			OnPickedUpWeapon(WeaponKinds.Photon);
-			PlaySound(AudioPhotonPickup);
-		} else if (col.gameObject.name.StartsWith("OrangePickup")) {
-			OnPickedUpWeapon(WeaponKinds.Scatter);
-			PlaySound(AudioScatterPickup);
-		} else if (col.gameObject.name.StartsWith("RedPickup")) {
-			OnPickedUpWeapon(WeaponKinds.Laser);
-			PlaySound(AudioLaserPickup);
-		} else if (col.gameObject.name.StartsWith("Projectile") && SinceSpawn >= 3) {
-			Projectile proj = col.gameObject.GetComponentInParent<Projectile>();
+        PickupBase Pickup = col.gameObject.GetComponent<PickupBase>();
+        if (Pickup)
+            Pickup.PickedUp();
+        Projectile proj = col.gameObject.GetComponentInParent<Projectile>();
+        if (proj && SinceSpawn >= 3) {
 			Health -= proj.Damage - Convert.ToInt32(proj.WeaponKind == Weapon.Kind);
 			if (Health <= 0) {
 				Health += 100;
@@ -87,18 +87,13 @@ public class PlayerEntity : Singleton<PlayerEntity> {
 				}
 				SinceSpawn = 0;
 			}
-		} else if (col.gameObject.name.StartsWith("WeaponXP")) {
-			Weapon.AddExperience();
-			Score += 25;
-			PlaySound(AudioXPPickup);
+            Destroy(col.gameObject);
 		}
-		if (!col.gameObject.name.StartsWith("Beam"))
-			Destroy(col.gameObject);
 	}
 
 	void Awake() {
         Weapon = WeaponBase.AttachWeapon(WeaponKinds.Unassigned, gameObject);
-		OnPickedUpWeapon(WeaponKinds.Photon);
+		WeaponPickup(WeaponKinds.Photon);
 		Source = GetComponent<AudioSource3D>();
         Settings.LeapSetupXZ();
     }
