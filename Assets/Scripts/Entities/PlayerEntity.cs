@@ -7,6 +7,7 @@ using Helpers;
 using Menus;
 using Weapons;
 
+[AddComponentMenu("Entities / Player")]
 public class PlayerEntity : Singleton<PlayerEntity> {
     [Header("Resources")]
     [Tooltip("Experience drop.")]

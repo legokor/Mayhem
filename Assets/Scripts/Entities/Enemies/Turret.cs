@@ -7,7 +7,7 @@ namespace Enemies {
     /// <summary>
     /// Turret - shoots at the player from the ground. Spawns in the scenery.
     /// </summary>
-    [AddComponentMenu("Enemies / Turret")]
+    [AddComponentMenu("Entities / Enemies / Turret")]
     public class Turret : EnemyBase {
         [Tooltip("The turret head object that looks at the player.")]
         public GameObject TurretHead;
