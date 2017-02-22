@@ -144,6 +144,7 @@ namespace Menus {
 
         public void Customize() {
             CameraTarget = CustomizeTarget;
+            Customization.Customize.Instance.Deserialize();
             PlaySoundOn(MenuPlace);
         }
 
@@ -176,6 +177,8 @@ namespace Menus {
 
         public void Back() {
             PlaySoundOn(CameraTarget.gameObject);
+            if (CameraTarget == CustomizeTarget)
+                Customization.Customize.Instance.Serialize();
             if (CameraTarget == CalibrationTarget) {
                 Calibration.Instance.gameObject.AddComponent<TimedDisabler>().Timer = .25f;
                 CameraTarget = SettingsTarget;
