@@ -12,6 +12,10 @@ public class LeapMouse : Singleton<LeapMouse> {
     public bool CenterPointer = true;
 
     /// <summary>
+    /// A tap happened in the last frame.
+    /// </summary>
+    bool Tapped = false;
+    /// <summary>
     /// The button the cursor was over last frame.
     /// </summary>
     Button LastHovered;
@@ -23,6 +27,10 @@ public class LeapMouse : Singleton<LeapMouse> {
     /// Extended finger count at the last frame.
     /// </summary>
     int LastFingerCount = 0;
+    /// <summary>
+    /// Cached hand position.
+    /// </summary>
+    Vector2 HandPosition = new Vector2(-1, -1);
 
     /// <summary>
     /// Create a ray from the camera at the given screen point.
@@ -30,6 +38,13 @@ public class LeapMouse : Singleton<LeapMouse> {
     public static Ray ScreenPointToRay() {
         Vector2 LeapPosition = LeapMotion.Instance.PalmOnScreenXY();
         return Camera.main.ScreenPointToRay(LeapPosition.x == -1 ? Input.mousePosition : new Vector3(LeapPosition.x, Screen.height - LeapPosition.y));
+    }
+
+    /// <summary>
+    /// Gets if the user tapped or clicked.
+    /// </summary>
+    public bool ActionDown() {
+        return HandPosition.x != -1 ? Tapped : Input.GetMouseButtonDown(0);
     }
 
 	void Start() {
@@ -41,31 +56,35 @@ public class LeapMouse : Singleton<LeapMouse> {
     }
 
     void OnGUI() {
-        Vector2 HandPosition = LeapMotion.Instance.PalmOnScreenXY();
         if (HandPosition.x != -1) {
-            int FingerCount = LeapMotion.Instance.ExtendedFingers();
             Vector2 DrawStartPos = HandPosition;
             if (CenterPointer) {
                 DrawStartPos -= MouseSize * .5f;
-                if (FingerCount != 0)
+                if (LastFingerCount != 0)
                     DrawStartPos -= MouseSize * .1f;
             }
-            GUI.DrawTexture(new Rect(DrawStartPos, MouseSize * (FingerCount != 0 ? 1 : .8f)), MouseIcon);
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector2(HandPosition.x, Screen.height - HandPosition.y)), out hit)) {
-                Button Hovered = hit.collider.gameObject.GetComponentInChildren<Button>();
-                if (Hovered) {
-                    if (LastHovered && Hovered != LastHovered)
-                        LastHovered.OnPointerExit(RandomPointerEventData);
-                    Hovered.OnPointerEnter(RandomPointerEventData);
-                    LastHovered = Hovered;
-                    if (FingerCount == 0 && LastFingerCount != 0)
-                        Hovered.OnPointerClick(RandomPointerEventData);
-                } else if (LastHovered)
-                    LastHovered.OnPointerExit(RandomPointerEventData);
-            } else if (LastHovered)
-                LastHovered.OnPointerExit(RandomPointerEventData);
-            LastFingerCount = FingerCount;
+            GUI.DrawTexture(new Rect(DrawStartPos, MouseSize * (LastFingerCount != 0 ? 1 : .8f)), MouseIcon);
         }
 	}
+
+    void Update() {
+        HandPosition = LeapMotion.Instance.PalmOnScreenXY();
+        int FingerCount = LeapMotion.Instance.ExtendedFingers();
+        Tapped = FingerCount == 0 && LastFingerCount != 0;
+            RaycastHit hit;
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector2(HandPosition.x, Screen.height - HandPosition.y)), out hit)) {
+            Button Hovered = hit.collider.gameObject.GetComponentInChildren<Button>();
+            if (Hovered) {
+                if (LastHovered && Hovered != LastHovered)
+                    LastHovered.OnPointerExit(RandomPointerEventData);
+                Hovered.OnPointerEnter(RandomPointerEventData);
+                LastHovered = Hovered;
+                if (Tapped)
+                    Hovered.OnPointerClick(RandomPointerEventData);
+            } else if (LastHovered)
+                LastHovered.OnPointerExit(RandomPointerEventData);
+        } else if (LastHovered)
+            LastHovered.OnPointerExit(RandomPointerEventData);
+        LastFingerCount = FingerCount;
+    }
 }

@@ -61,6 +61,12 @@ namespace Menus.Customization {
                     transform.rotation = Quaternion.LookRotation(Body.forward, Hit.normal);
                     transform.localScale = new Vector3(1 + Convert.ToSingle(Diff.x < 0) * -2, 1, 1);
                     PlaceCounterpart();
+                    if (LeapMouse.Instance.ActionDown())
+                        Attach();
+                } else {
+                    transform.position = Counterpart.transform.position = Hit.point;
+                    transform.rotation = Counterpart.transform.rotation = Quaternion.identity;
+                    transform.localScale = Counterpart.transform.localScale = new Vector3(.5f, .5f, .5f);
                 }
             }
         }
