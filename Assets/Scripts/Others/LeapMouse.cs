@@ -24,6 +24,14 @@ public class LeapMouse : Singleton<LeapMouse> {
     /// </summary>
     int LastFingerCount = 0;
 
+    /// <summary>
+    /// Create a ray from the camera at the given screen point.
+    /// </summary>
+    public static Ray ScreenPointToRay() {
+        Vector2 LeapPosition = LeapMotion.Instance.PalmOnScreenXY();
+        return Camera.main.ScreenPointToRay(LeapPosition.x == -1 ? Input.mousePosition : new Vector3(LeapPosition.x, Screen.height - LeapPosition.y));
+    }
+
 	void Start() {
         RandomPointerEventData = new PointerEventData(GetComponent<EventSystem>());
     }
