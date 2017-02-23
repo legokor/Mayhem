@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 
 namespace Menus.Customization {
     /// <summary>
@@ -15,7 +16,26 @@ namespace Menus.Customization {
         /// Saves the created ship.
         /// </summary>
         public void Serialize() {
-            // TODO: save components
+            StringBuilder Serialization = new StringBuilder();
+            int AttachmentCount = Body.transform.childCount;
+            for (int Attachment = 0; Attachment < AttachmentCount; ++Attachment) {
+                Transform ChildTransform = Body.transform.GetChild(Attachment);
+                GameObject Child = Body.transform.GetChild(Attachment).gameObject;
+                int Obj = 0;
+                while (Child.name.StartsWith(Attachments[Obj].name))
+                    ++Obj;
+                Serialization.Append(Attachments[Obj].name).Append(";");
+                Serialization.Append(ChildTransform.localPosition.x).Append(";");
+                Serialization.Append(ChildTransform.localPosition.y).Append(";");
+                Serialization.Append(ChildTransform.localPosition.z).Append(";");
+                Serialization.Append(ChildTransform.localRotation.x).Append(";");
+                Serialization.Append(ChildTransform.localRotation.y).Append(";");
+                Serialization.Append(ChildTransform.localRotation.z).Append(";");
+                Serialization.Append(ChildTransform.localScale.x).Append(";");
+                Serialization.Append(ChildTransform.localScale.y).Append(";");
+                Serialization.Append(ChildTransform.localScale.z).Append(";");
+            }
+            // TODO: save it
         }
 
         /// <summary>

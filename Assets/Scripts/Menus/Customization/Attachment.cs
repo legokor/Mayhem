@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Menus.Customization {
     /// <summary>
@@ -13,14 +14,18 @@ namespace Menus.Customization {
         /// <summary>
         /// Attached to the body.
         /// </summary>
-        bool Attached = false;
+        bool Attached;
 
         /// <summary>
         /// Create the counterpart.
         /// </summary>
         void Start() {
+            Attached = transform.parent == Customize.Instance.Body.transform;
             Counterpart = Instantiate(gameObject);
+            Counterpart.transform.parent = transform;
             Destroy(Counterpart.GetComponent<Attachment>());
+            if (Attached)
+                PlaceCounterpart();
         }
 
         public void Attach() {
@@ -31,6 +36,14 @@ namespace Menus.Customization {
         public void Detach() {
             transform.parent = null;
             Attached = false;
+        }
+
+        void PlaceCounterpart() {
+            Transform Body = Customize.Instance.Body.transform;
+            Vector3 Diff = Body.InverseTransformPoint(transform.position) * Body.localScale.x;
+            Counterpart.transform.position = Body.position + Body.rotation * new Vector3(-Diff.x, Diff.y, Diff.z);
+            Counterpart.transform.rotation = Quaternion.LookRotation(Body.forward, new Vector3(transform.up.x, -transform.up.y, -transform.up.z));
+            Counterpart.transform.localScale = new Vector3(1 + Convert.ToSingle(Diff.x < 0) * -2, -1, 1);
         }
 
         /// <summary>
@@ -44,13 +57,10 @@ namespace Menus.Customization {
                 if (Hit.collider.gameObject == Customize.Instance.Body) {
                     Transform Body = Customize.Instance.Body.transform;
                     Vector3 Diff = Body.InverseTransformPoint(Hit.point) * Body.localScale.x;
-                    bool Inversion = Diff.x > 0;
                     transform.position = Hit.point;
                     transform.rotation = Quaternion.LookRotation(Body.forward, Hit.normal);
-                    transform.localScale = new Vector3(Inversion ? 1 : -1, 1, 1);
-                    Counterpart.transform.position = Body.position + Body.rotation * new Vector3(-Diff.x, Diff.y, Diff.z);
-                    Counterpart.transform.rotation = Quaternion.LookRotation(Body.forward, new Vector3(Hit.normal.x, -Hit.normal.y, -Hit.normal.z));
-                    Counterpart.transform.localScale = new Vector3(Inversion ? 1 : -1, -1, 1);
+                    transform.localScale = new Vector3(1 + Convert.ToSingle(Diff.x < 0) * -2, 1, 1);
+                    PlaceCounterpart();
                 }
             }
         }
