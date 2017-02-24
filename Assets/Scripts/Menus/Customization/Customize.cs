@@ -74,15 +74,5 @@ namespace Menus.Customization {
             }
             LastPointerPos = PointerPos;
         }
-
-        private float RotateAroundAxis(GameObject objectToRotate, string joyAxisName, Vector3 vectorToRotateAround, float speed) {
-            if (string.IsNullOrEmpty(joyAxisName)) {
-                return 0;
-            }
-
-            var result = Input.GetAxis(joyAxisName) * speed * 60 * Time.deltaTime;
-            objectToRotate.transform.rotation = Quaternion.Euler(vectorToRotateAround * result) * objectToRotate.transform.rotation;
-            return result;
-        }
     }
 }
