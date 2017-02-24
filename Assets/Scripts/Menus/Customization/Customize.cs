@@ -13,6 +13,19 @@ namespace Menus.Customization {
         public GameObject[] Attachments;
 
         /// <summary>
+        /// The body's rotation at spawn.
+        /// </summary>
+        Quaternion StartRotation;
+        /// <summary>
+        /// Last screen position pointed to.
+        /// </summary>
+        Vector2 LastPointerPos;
+
+        void Start() {
+            StartRotation = Body.transform.rotation;
+        }
+
+        /// <summary>
         /// Saves the created ship.
         /// </summary>
         public void Serialize() {
@@ -46,7 +59,30 @@ namespace Menus.Customization {
             int Children = Body.transform.childCount;
             while (Children-- != 0)
                 Destroy(Body.transform.GetChild(Children).gameObject);
+            Body.transform.rotation = StartRotation; // Reset rotation.
             // TODO: load components
+        }
+
+        void Update() {
+            Vector2 PointerPos = LeapMouse.Instance.ScreenPosition();
+            if (LeapMouse.Instance.Action()) {
+                Vector2 Difference = LastPointerPos - PointerPos;
+                Body.transform.rotation = Quaternion.Euler(Camera.main.transform.up * Difference.x) *
+                                          Quaternion.Euler(Camera.main.transform.right * Difference.y) * Body.transform.rotation;
+                Vector3 EulerAngles = Body.transform.localEulerAngles;
+                Body.transform.localEulerAngles = new Vector3(EulerAngles.x, EulerAngles.y, 0);
+            }
+            LastPointerPos = PointerPos;
+        }
+
+        private float RotateAroundAxis(GameObject objectToRotate, string joyAxisName, Vector3 vectorToRotateAround, float speed) {
+            if (string.IsNullOrEmpty(joyAxisName)) {
+                return 0;
+            }
+
+            var result = Input.GetAxis(joyAxisName) * speed * 60 * Time.deltaTime;
+            objectToRotate.transform.rotation = Quaternion.Euler(vectorToRotateAround * result) * objectToRotate.transform.rotation;
+            return result;
         }
     }
 }

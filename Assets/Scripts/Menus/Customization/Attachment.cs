@@ -42,8 +42,9 @@ namespace Menus.Customization {
             Transform Body = Customize.Instance.Body.transform;
             Vector3 Diff = Body.InverseTransformPoint(transform.position) * Body.localScale.x;
             Counterpart.transform.position = Body.position + Body.rotation * new Vector3(-Diff.x, Diff.y, Diff.z);
-            Counterpart.transform.rotation = Quaternion.LookRotation(Body.forward, new Vector3(transform.up.x, -transform.up.y, -transform.up.z));
-            Counterpart.transform.localScale = new Vector3(1 + Convert.ToSingle(Diff.x < 0) * -2, -1, 1);
+            Vector3 EulerAngles = transform.eulerAngles;
+            Counterpart.transform.eulerAngles = new Vector3(EulerAngles.x, EulerAngles.y, 180f - EulerAngles.z);
+            Counterpart.transform.localScale = new Vector3(1, -1, 1);
         }
 
         /// <summary>

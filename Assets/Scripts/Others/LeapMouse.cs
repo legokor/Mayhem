@@ -47,6 +47,20 @@ public class LeapMouse : Singleton<LeapMouse> {
         return HandPosition.x != -1 ? Tapped : Input.GetMouseButtonDown(0);
     }
 
+    /// <summary>
+    /// Gets if the user grabs.
+    /// </summary>
+    public bool Action() {
+        return HandPosition.x != -1 ? LastFingerCount == 0 : Input.GetMouseButton(0);
+    }
+
+    /// <summary>
+    /// Gets the pointer (mouse or main hand) position on screen.
+    /// </summary>
+    public Vector2 ScreenPosition() {
+        return HandPosition.x != -1 ? LeapMotion.Instance.PalmOnScreenXY() : new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+    }
+
 	void Start() {
         RandomPointerEventData = new PointerEventData(GetComponent<EventSystem>());
     }
