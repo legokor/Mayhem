@@ -24,18 +24,29 @@ namespace Menus.Customization {
             Counterpart = Instantiate(gameObject);
             Counterpart.transform.parent = transform;
             Destroy(Counterpart.GetComponent<Attachment>());
-            if (Attached)
+            if (Attached) {
                 PlaceCounterpart();
+                CreateCollider();
+            }
         }
 
         public void Attach() {
             transform.parent = Customize.Instance.Body.transform;
+            CreateCollider();
             Attached = true;
         }
 
         public void Detach() {
             transform.parent = null;
             Attached = false;
+            Destroy(transform.GetChild(0).GetComponent<MeshCollider>());
+            Destroy(Counterpart.transform.GetChild(0).GetComponent<MeshCollider>());
+        }
+
+        void CreateCollider() {
+            MeshCollider NewCollider = transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
+            MeshCollider CounterCollider = Counterpart.transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
+            NewCollider.sharedMesh = CounterCollider.sharedMesh = GetComponentInChildren<MeshFilter>().sharedMesh;
         }
 
         void PlaceCounterpart() {
@@ -55,19 +66,19 @@ namespace Menus.Customization {
                 return;
             RaycastHit Hit;
             if (Physics.Raycast(LeapMouse.ScreenPointToRay(), out Hit)) {
-                if (Hit.collider.gameObject == Customize.Instance.Body) {
-                    Transform Body = Customize.Instance.Body.transform;
+                Transform Body = Customize.Instance.Body.transform;
+                if (Hit.collider.gameObject == Customize.Instance.Body || Hit.collider.transform.GetComponentInParent<Attachment>()) {
                     Vector3 Diff = Body.InverseTransformPoint(Hit.point) * Body.localScale.x;
                     transform.position = Hit.point;
                     transform.rotation = Quaternion.LookRotation(Body.forward, Hit.normal);
-                    transform.localScale = new Vector3(1 + Convert.ToSingle(Diff.x < 0) * -2, 1, 1);
+                    transform.localScale = new Vector3(Body.localScale.x + Convert.ToSingle(Diff.x < 0) * -2 * Body.localScale.x, Body.localScale.y, Body.localScale.z);
                     PlaceCounterpart();
                     if (LeapMouse.Instance.ActionDown())
                         Attach();
                 } else {
                     transform.position = Counterpart.transform.position = Hit.point;
                     transform.rotation = Counterpart.transform.rotation = Quaternion.identity;
-                    transform.localScale = Counterpart.transform.localScale = new Vector3(.5f, .5f, .5f);
+                    transform.localScale = Counterpart.transform.localScale = Body.localScale * .5f;
                 }
             }
         }
