@@ -31,7 +31,8 @@ namespace Menus.Customization {
         }
 
         public void Attach() {
-            transform.parent = Customize.Instance.Body.transform;
+            Transform Body = Customize.Instance.Body.transform;
+            transform.parent = Body;
             CreateCollider();
             Attached = true;
         }

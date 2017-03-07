@@ -148,6 +148,10 @@ namespace Menus {
             PlaySoundOn(MenuPlace);
         }
 
+        public void Cleanup() {
+            Customization.Customize.Instance.Cleanup();
+        }
+
         public void SettingsButton() {
             CameraTarget = SettingsTarget;
             PlaySoundOn(MenuPlace);
