@@ -14,6 +14,10 @@ namespace Menus.Customization {
         public GameObject[] Attachments;
 
         /// <summary>
+        /// Copy of the components for ingame use.
+        /// </summary>
+        public static GameObject[] AttachmentCopies;
+        /// <summary>
         /// The body's rotation at spawn.
         /// </summary>
         Quaternion StartRotation;
@@ -23,6 +27,7 @@ namespace Menus.Customization {
         Vector2 LastPointerPos;
 
         void Start() {
+            AttachmentCopies = (GameObject[])Attachments.Clone();
             StartRotation = Body.transform.rotation;
         }
 
@@ -67,9 +72,9 @@ namespace Menus.Customization {
                     ChildTransform = ChildTransform.GetChild(1);
                 GameObject Child = ChildTransform.gameObject;
                 int Obj = 0;
-                while (!Child.name.StartsWith(Attachments[Obj].name))
+                while (!Child.name.StartsWith(AttachmentCopies[Obj].name))
                     ++Obj;
-                Serialization.Append(Attachments[Obj].name).Append(";");
+                Serialization.Append(AttachmentCopies[Obj].name).Append(";");
                 Vector3 LocalPos = ChildTransform.localPosition, Angles = ChildTransform.localEulerAngles;
                 Serialization.Append(SerializeFloat(LocalPos.x)).Append(";");
                 Serialization.Append(SerializeFloat(LocalPos.y)).Append(";");
@@ -91,30 +96,34 @@ namespace Menus.Customization {
                 Destroy(Body.transform.GetChild(Children).gameObject);
         }
 
+        public static void DeserializeTo(GameObject Target) {
+            string[] Ship = PlayerPrefs.GetString("Ship", "").Split(';');
+            int ShipPos = 0, MaxPos = Ship.Length;
+            while (MaxPos - ShipPos >= 7) {
+                string Name = Ship[ShipPos++];
+                int Obj = 0, Objs = AttachmentCopies.Length;
+                while (!AttachmentCopies[Obj].name.Equals(Name))
+                    if (++Obj >= Objs)
+                        break;
+                Vector3 Position = new Vector3(DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]));
+                Vector3 EulerAngles = new Vector3(DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]));
+                GameObject Attached = Instantiate(AttachmentCopies[Obj]);
+                Attached.GetComponent<Attachment>().Body = Target;
+                Transform AttachmentTransform = Attached.transform;
+                AttachmentTransform.parent = Target.transform;
+                AttachmentTransform.localPosition = Position;
+                AttachmentTransform.localEulerAngles = EulerAngles;
+                AttachmentTransform.localScale = new Vector3(1, 1, 1);
+            }
+        }
+
         /// <summary>
         /// Loads the saved player ship.
         /// </summary>
         public void Deserialize() {
             Body.transform.rotation = StartRotation; // Reset rotation.
             Cleanup();
-            string[] Ship = PlayerPrefs.GetString("Ship", "").Split(';');
-            int ShipPos = 0, MaxPos = Ship.Length;
-            while (MaxPos - ShipPos >= 7) {
-                string Name = Ship[ShipPos++];
-                int Obj = 0, Objs = Attachments.Length;
-                while (!Attachments[Obj].name.Equals(Name)) {
-                    ++Obj;
-                    if (Obj >= Objs)
-                        break;
-                }
-                Vector3 Position = new Vector3(DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]));
-                Vector3 EulerAngles = new Vector3(DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]), DeserializeFloat(Ship[ShipPos++]));
-                Transform AttachmentTransform = Instantiate(Attachments[Obj]).transform;
-                AttachmentTransform.parent = Body.transform;
-                AttachmentTransform.localPosition = Position;
-                AttachmentTransform.localEulerAngles = EulerAngles;
-                AttachmentTransform.localScale = new Vector3(1, 1, 1);
-            }
+            DeserializeTo(Body);
         }
 
         void Update() {

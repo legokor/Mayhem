@@ -7,6 +7,9 @@ namespace Menus.Customization {
     /// </summary>
     [AddComponentMenu("Menus / Customization / Attachment")]
     public class Attachment : MonoBehaviour {
+        [Tooltip("The body to attach to.")]
+        public GameObject Body;
+
         /// <summary>
         /// Other side component.
         /// </summary>
@@ -20,7 +23,7 @@ namespace Menus.Customization {
         /// Create the counterpart.
         /// </summary>
         void Start() {
-            Attached = transform.parent == Customize.Instance.Body.transform;
+            Attached = transform.parent == Body.transform;
             Counterpart = Instantiate(gameObject);
             Counterpart.transform.parent = transform;
             Destroy(Counterpart.GetComponent<Attachment>());
@@ -31,7 +34,7 @@ namespace Menus.Customization {
         }
 
         public void Attach() {
-            transform.parent = Customize.Instance.Body.transform;
+            transform.parent = Body.transform;
             CreateCollider();
             Attached = true;
         }
@@ -50,9 +53,9 @@ namespace Menus.Customization {
         }
 
         void PlaceCounterpart() {
-            Transform Body = Customize.Instance.Body.transform;
-            Vector3 Diff = Body.InverseTransformPoint(transform.position) * Body.localScale.x;
-            Counterpart.transform.position = Body.position + Body.rotation * new Vector3(-Diff.x, Diff.y, Diff.z);
+            Transform BodyT = Body.transform;
+            Vector3 Diff = BodyT.InverseTransformPoint(transform.position) * BodyT.lossyScale.x;
+            Counterpart.transform.position = BodyT.position + BodyT.rotation * new Vector3(-Diff.x, Diff.y, Diff.z);
             Vector3 EulerAngles = transform.eulerAngles;
             Counterpart.transform.eulerAngles = new Vector3(EulerAngles.x, EulerAngles.y, 180f - EulerAngles.z);
             Counterpart.transform.localScale = new Vector3(1, -1, 1);
@@ -66,19 +69,19 @@ namespace Menus.Customization {
                 return;
             RaycastHit Hit;
             if (Physics.Raycast(LeapMouse.ScreenPointToRay(), out Hit)) {
-                Transform Body = Customize.Instance.Body.transform;
-                if (Hit.collider.gameObject == Customize.Instance.Body || Hit.collider.transform.GetComponentInParent<Attachment>()) {
-                    Vector3 Diff = Body.InverseTransformPoint(Hit.point) * Body.localScale.x;
+                Transform BodyT = Body.transform;
+                if (Hit.collider.gameObject == Body || Hit.collider.transform.GetComponentInParent<Attachment>()) {
+                    Vector3 Diff = BodyT.InverseTransformPoint(Hit.point) * BodyT.localScale.x;
                     transform.position = Hit.point;
-                    transform.rotation = Quaternion.LookRotation(Body.forward, Hit.normal);
-                    transform.localScale = new Vector3(Body.localScale.x + Convert.ToSingle(Diff.x < 0) * -2 * Body.localScale.x, Body.localScale.y, Body.localScale.z);
+                    transform.rotation = Quaternion.LookRotation(BodyT.forward, Hit.normal);
+                    transform.localScale = new Vector3(BodyT.localScale.x + Convert.ToSingle(Diff.x < 0) * -2 * BodyT.localScale.x, BodyT.localScale.y, BodyT.localScale.z);
                     PlaceCounterpart();
                     if (LeapMouse.Instance.ActionDown())
                         Attach();
                 } else {
                     transform.position = Counterpart.transform.position = Hit.point;
                     transform.rotation = Counterpart.transform.rotation = Quaternion.identity;
-                    transform.localScale = Counterpart.transform.localScale = Body.localScale * .5f;
+                    transform.localScale = Counterpart.transform.localScale = BodyT.localScale * .5f;
                 }
             }
         }

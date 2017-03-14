@@ -5,6 +5,7 @@ using Cavern;
 
 using Helpers;
 using Menus;
+using Menus.Customization;
 using Pickups;
 using Weapons;
 
@@ -96,6 +97,7 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         WeaponPickup(WeaponKinds.Photon);
         Source = GetComponent<AudioSource3D>();
         Settings.LeapSetupXZ();
+        Customize.DeserializeTo(transform.GetChild(0).gameObject);
     }
 
     void OnGUI() {
