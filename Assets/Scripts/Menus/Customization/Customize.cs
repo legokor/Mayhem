@@ -96,6 +96,9 @@ namespace Menus.Customization {
                 Destroy(Body.transform.GetChild(Children).gameObject);
         }
 
+        /// <summary>
+        /// Loads the saved player ship on a given GameObject.
+        /// </summary>
         public static void DeserializeTo(GameObject Target) {
             string[] Ship = PlayerPrefs.GetString("Ship", "").Split(';');
             int ShipPos = 0, MaxPos = Ship.Length;
@@ -118,7 +121,7 @@ namespace Menus.Customization {
         }
 
         /// <summary>
-        /// Loads the saved player ship.
+        /// Loads the saved player ship in the menu.
         /// </summary>
         public void Deserialize() {
             Body.transform.rotation = StartRotation; // Reset rotation.
