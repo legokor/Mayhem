@@ -37,7 +37,7 @@ namespace Menus.Customization {
 #endif
             Attached = transform.parent == Body.transform;
             Counterpart = Instantiate(gameObject);
-            Counterpart.transform.parent = transform;
+            Counterpart.transform.parent = Body.transform;
             Destroy(Counterpart.GetComponent<Attachment>());
             if (Attached) {
                 PlaceCounterpart();
@@ -118,7 +118,7 @@ namespace Menus.Customization {
             // Snap to the body and placement
             if (Physics.Raycast(LeapMouse.ScreenPointToRay(), out Hit)) {
                 Transform BodyT = Body.transform;
-                if (Hit.collider.gameObject == Body || Hit.collider.transform.GetComponentInParent<Attachment>()) {
+                if (Hit.collider.gameObject == Body || Hit.collider.transform.parent.parent == Body.transform) {
                     Vector3 Diff = BodyT.InverseTransformPoint(Hit.point) * BodyT.localScale.x;
                     transform.position = Hit.point;
                     transform.rotation = Quaternion.LookRotation(BodyT.forward, Hit.normal);
