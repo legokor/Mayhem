@@ -68,20 +68,22 @@ namespace Menus.Customization {
             int AttachmentCount = Body.transform.childCount;
             for (int Attachment = 0; Attachment < AttachmentCount; ++Attachment) {
                 Transform ChildTransform = Body.transform.GetChild(Attachment);
-                if (ChildTransform.localEulerAngles.x < 0)
-                    ChildTransform = ChildTransform.GetChild(1);
-                GameObject Child = ChildTransform.gameObject;
-                int Obj = 0;
-                while (!Child.name.StartsWith(AttachmentCopies[Obj].name))
-                    ++Obj;
-                Serialization.Append(AttachmentCopies[Obj].name).Append(";");
-                Vector3 LocalPos = ChildTransform.localPosition, Angles = ChildTransform.localEulerAngles;
-                Serialization.Append(SerializeFloat(LocalPos.x)).Append(";");
-                Serialization.Append(SerializeFloat(LocalPos.y)).Append(";");
-                Serialization.Append(SerializeFloat(LocalPos.z)).Append(";");
-                Serialization.Append(SerializeFloat(Angles.x)).Append(";");
-                Serialization.Append(SerializeFloat(Angles.y)).Append(";");
-                Serialization.Append(SerializeFloat(Angles.z)).Append(";");
+                if (ChildTransform.GetComponent<Attachment>()) {
+                    if (ChildTransform.localEulerAngles.x < 0)
+                        ChildTransform = ChildTransform.GetChild(1);
+                    GameObject Child = ChildTransform.gameObject;
+                    int Obj = 0;
+                    while (!Child.name.StartsWith(AttachmentCopies[Obj].name))
+                        ++Obj;
+                    Serialization.Append(AttachmentCopies[Obj].name).Append(";");
+                    Vector3 LocalPos = ChildTransform.localPosition, Angles = ChildTransform.localEulerAngles;
+                    Serialization.Append(SerializeFloat(LocalPos.x)).Append(";");
+                    Serialization.Append(SerializeFloat(LocalPos.y)).Append(";");
+                    Serialization.Append(SerializeFloat(LocalPos.z)).Append(";");
+                    Serialization.Append(SerializeFloat(Angles.x)).Append(";");
+                    Serialization.Append(SerializeFloat(Angles.y)).Append(";");
+                    Serialization.Append(SerializeFloat(Angles.z)).Append(";");
+                }
             }
             PlayerPrefs.SetString("Ship", Serialization.ToString());
             PlayerPrefs.Save();
