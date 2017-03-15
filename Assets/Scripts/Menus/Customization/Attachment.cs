@@ -11,6 +11,10 @@ namespace Menus.Customization {
         public GameObject Body;
 
         /// <summary>
+        /// Collider of the attachment.
+        /// </summary>
+        MeshCollider BaseCollider, CounterpartCollider;
+        /// <summary>
         /// Other side component.
         /// </summary>
         GameObject Counterpart;
@@ -18,11 +22,19 @@ namespace Menus.Customization {
         /// Attached to the body.
         /// </summary>
         bool Attached;
+        /// <summary>
+        /// Is there an attachment picked up?
+        /// </summary>
+        static bool PickedUp;
 
         /// <summary>
         /// Create the counterpart.
         /// </summary>
         void Start() {
+#if UNITY_EDITOR
+            if (!Body)
+                Body = Customize.Instance.Body; // If the attachment was created outside the game code, set the correct body
+#endif
             Attached = transform.parent == Body.transform;
             Counterpart = Instantiate(gameObject);
             Counterpart.transform.parent = transform;
@@ -31,27 +43,42 @@ namespace Menus.Customization {
                 PlaceCounterpart();
                 CreateCollider();
             }
+            PickedUp = !Attached;
         }
 
+        /// <summary>
+        /// Attach this component to the body and lock it in place.
+        /// </summary>
         public void Attach() {
             transform.parent = Body.transform;
             CreateCollider();
             Attached = true;
+            PickedUp = false;
         }
 
+        /// <summary>
+        /// Remove this component from the body for replacement or removal.
+        /// </summary>
         public void Detach() {
             transform.parent = null;
             Attached = false;
-            Destroy(transform.GetChild(0).GetComponent<MeshCollider>());
-            Destroy(Counterpart.transform.GetChild(0).GetComponent<MeshCollider>());
+            PickedUp = true;
+            Destroy(BaseCollider);
+            Destroy(CounterpartCollider);
         }
 
+        /// <summary>
+        /// Creates and sets up the colliders for both the base attachment and the counterpart.
+        /// </summary>
         void CreateCollider() {
-            MeshCollider NewCollider = transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
-            MeshCollider CounterCollider = Counterpart.transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
-            NewCollider.sharedMesh = CounterCollider.sharedMesh = GetComponentInChildren<MeshFilter>().sharedMesh;
+            BaseCollider = transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
+            CounterpartCollider = Counterpart.transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
+            BaseCollider.sharedMesh = CounterpartCollider.sharedMesh = GetComponentInChildren<MeshFilter>().sharedMesh;
         }
 
+        /// <summary>
+        /// Updates counterpart transform.
+        /// </summary>
         void PlaceCounterpart() {
             Transform BodyT = Body.transform;
             Vector3 Diff = BodyT.InverseTransformPoint(transform.position) * BodyT.lossyScale.x;
@@ -62,12 +89,33 @@ namespace Menus.Customization {
         }
 
         /// <summary>
-        /// Snap to the body.
+        /// Attachment placement and replacement.
         /// </summary>
         void Update() {
-            if (Attached)
-                return;
             RaycastHit Hit;
+            // Selection and removal handling
+            if (Attached) {
+                bool ResetScaling = transform.localScale.x > 1.1f;
+                if (!PickedUp && // No attachment is selected
+                    !PlayerEntity.Instance && // Not ingame
+                    Physics.Raycast(LeapMouse.ScreenPointToRay(), out Hit) && // Mouse is hovered part 1
+                    (Hit.collider == BaseCollider || Hit.collider == CounterpartCollider)) { // Mouse is hovered part 2
+                    float Upscale = 1f + Time.deltaTime * .25f;
+                    transform.localScale *= Upscale;
+                    Counterpart.transform.localScale *= Upscale;
+                    if (LeapMouse.Instance.ActionDown()) {
+                        Detach();
+                        ResetScaling = true;
+                    }
+                } else
+                    ResetScaling = true;
+                if (ResetScaling) {
+                    transform.localScale = new Vector3(1, 1, 1);
+                    Counterpart.transform.localScale = new Vector3(1, -1, 1);
+                }
+                return;
+            }
+            // Snap to the body and placement
             if (Physics.Raycast(LeapMouse.ScreenPointToRay(), out Hit)) {
                 Transform BodyT = Body.transform;
                 if (Hit.collider.gameObject == Body || Hit.collider.transform.GetComponentInParent<Attachment>()) {
