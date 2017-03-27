@@ -70,7 +70,7 @@ namespace Menus.Customization {
                 Transform ChildTransform = Body.transform.GetChild(Attachment);
                 if (ChildTransform.GetComponent<Attachment>()) {
                     if (ChildTransform.localEulerAngles.x < 0)
-                        ChildTransform = ChildTransform.GetChild(1);
+                        continue;
                     GameObject Child = ChildTransform.gameObject;
                     int Obj = 0;
                     while (!Child.name.StartsWith(AttachmentCopies[Obj].name))
@@ -86,6 +86,7 @@ namespace Menus.Customization {
                 }
             }
             PlayerPrefs.SetString("Ship", Serialization.ToString());
+            Debug.Log(Serialization);
             PlayerPrefs.Save();
         }
 
