@@ -86,7 +86,6 @@ namespace Menus.Customization {
                 }
             }
             PlayerPrefs.SetString("Ship", Serialization.ToString());
-            Debug.Log(Serialization);
             PlayerPrefs.Save();
         }
 
