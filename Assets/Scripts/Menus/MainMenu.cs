@@ -181,8 +181,10 @@ namespace Menus {
 
         public void Back() {
             PlaySoundOn(CameraTarget.gameObject);
-            if (CameraTarget == CustomizeTarget)
+            if (CameraTarget == CustomizeTarget) {
                 Customization.Customize.Instance.Serialize();
+                Customization.Attachment.DestroyPickedUp();
+            }
             if (CameraTarget == CalibrationTarget) {
                 Calibration.Instance.gameObject.AddComponent<TimedDisabler>().Timer = .25f;
                 CameraTarget = SettingsTarget;

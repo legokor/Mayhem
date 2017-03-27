@@ -25,7 +25,15 @@ namespace Menus.Customization {
         /// <summary>
         /// Is there an attachment picked up?
         /// </summary>
-        static bool PickedUp;
+        public static Attachment PickedUp { get; private set; }
+
+        /// <summary>
+        /// If there's a picked up attachment, destroy it.
+        /// </summary>
+        public static void DestroyPickedUp() {
+            if (PickedUp)
+                Destroy(PickedUp.gameObject);
+        }
 
         /// <summary>
         /// Create the counterpart.
@@ -42,8 +50,8 @@ namespace Menus.Customization {
             if (Attached) {
                 PlaceCounterpart();
                 CreateCollider();
-            }
-            PickedUp = !Attached;
+            } else
+                PickedUp = this;
         }
 
         /// <summary>
@@ -53,7 +61,7 @@ namespace Menus.Customization {
             transform.parent = Body.transform;
             CreateCollider();
             Attached = true;
-            PickedUp = false;
+            PickedUp = null;
         }
 
         /// <summary>
@@ -62,7 +70,7 @@ namespace Menus.Customization {
         public void Detach() {
             transform.parent = null;
             Attached = false;
-            PickedUp = true;
+            PickedUp = this;
             Destroy(BaseCollider);
             Destroy(CounterpartCollider);
         }
@@ -132,6 +140,10 @@ namespace Menus.Customization {
                     transform.localScale = Counterpart.transform.localScale = BodyT.localScale * .5f;
                 }
             }
+        }
+
+        void OnDestroy() {
+            Destroy(Counterpart);
         }
     }
 }
