@@ -55,8 +55,12 @@ namespace Menus.Customization {
         /// </summary>
         static float DeserializeFloat(string x) {
             byte[] OriginalFloat = new byte[4];
-            for (int i = 0; i < 4; ++i)
-                OriginalFloat[i] = x[i] == x[4] ? (byte)0 : (byte)x[i];
+            if (x.Length > 4)
+                for (int i = 0; i < 4; ++i)
+                    OriginalFloat[i] = x[i] == x[4] ? (byte)0 : (byte)x[i];
+            else
+                for (int i = 0; i < 4; ++i)
+                    OriginalFloat[i] = (byte)x[i];
             return BitConverter.ToSingle(OriginalFloat, 0);
         }
 
