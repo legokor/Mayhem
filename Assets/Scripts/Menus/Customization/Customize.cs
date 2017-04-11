@@ -36,18 +36,21 @@ namespace Menus.Customization {
         /// </summary>
         static char[] SerializeFloat(float x) {
             char[] Out = new char[6];
-            // First 4 bytes: actual string
+            // First 4 bytes: float data
             byte[] Bits = BitConverter.GetBytes(x);
-            Out[0] = 'A';
-            Out[1] = (char)Bits[0]; Out[2] = (char)Bits[1]; Out[3] = (char)Bits[2]; Out[4] = (char)Bits[3];
-            // Last byte: what to replace zero to - anything that's not used (something from 1 to 5)
-            Out[5] = 'A';
+            for (int i = 0; i < 4; ++i) Out[i] = (char)Bits[i];
+            // Last bytes: what to replace zero and ';' to - anything that's not used (something from 0 to 4 and A to D)
+            Out[4] = '0'; // Offset for zero character
+            Out[5] = 'A'; // Offset for ';' character
+            while (Bits[0] == Out[4] || Bits[1] == Out[4] || Bits[2] == Out[4] || Bits[3] == Out[4])
+                ++Out[4];
             while (Bits[0] == Out[5] || Bits[1] == Out[5] || Bits[2] == Out[5] || Bits[3] == Out[5])
                 ++Out[5];
-            // Replace zeros with the new value that's representing zero
-            for (int i = 0; i < 4; ++i)
-                if (Out[i] == 0)
-                    Out[i] = Out[5];
+            // Replace zeros with the new values that represent zero and ';'
+            for (int i = 0; i < 4; ++i) {
+                if (Out[i] == 0) Out[i] = Out[4];
+                if (Out[i] == ';') Out[i] = Out[5];
+            }
             return Out;
         }
 
@@ -56,8 +59,11 @@ namespace Menus.Customization {
         /// </summary>
         static float DeserializeFloat(string x) {
             byte[] OriginalFloat = new byte[4];
-            for (int i = 1; i <= 4; ++i)
-                OriginalFloat[i - 1] = x[i] == x[5] ? (byte)0 : (byte)x[i];
+            for (int i = 0; i < 4; ++i) {
+                if (x[i] == x[4]) OriginalFloat[i] = 0;
+                else if (x[i] == x[5]) OriginalFloat[i] = (byte)';';
+                else OriginalFloat[i] = (byte)x[i];
+            }
             return BitConverter.ToSingle(OriginalFloat, 0);
         }
 
@@ -70,8 +76,6 @@ namespace Menus.Customization {
             for (int Attachment = 0; Attachment < AttachmentCount; ++Attachment) {
                 Transform ChildTransform = Body.transform.GetChild(Attachment);
                 if (ChildTransform.GetComponent<Attachment>()) {
-                    if (ChildTransform.localEulerAngles.x < 0)
-                        continue;
                     GameObject Child = ChildTransform.gameObject;
                     int Obj = 0;
                     while (!Child.name.StartsWith(AttachmentCopies[Obj].name))
