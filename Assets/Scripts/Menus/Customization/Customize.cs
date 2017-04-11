@@ -12,11 +12,21 @@ namespace Menus.Customization {
         public GameObject Body;
         [Tooltip("Possible components to attach.")]
         public GameObject[] Attachments;
+        [Tooltip("Selectable colors for the ship.")]
+        public Material[] Colors;
 
         /// <summary>
         /// Copy of the components for ingame use.
         /// </summary>
         public static GameObject[] AttachmentCopies;
+        /// <summary>
+        /// Copy of colors for ingame use.
+        /// </summary>
+        public static Material[] ColorCopies;
+        /// <summary>
+        /// The material to use from the Colors array.
+        /// </summary>
+        int SelectedColor = 0;
         /// <summary>
         /// The body's rotation at spawn.
         /// </summary>
@@ -28,7 +38,25 @@ namespace Menus.Customization {
 
         void Start() {
             AttachmentCopies = (GameObject[])Attachments.Clone();
+            ColorCopies = (Material[])Colors.Clone();
             StartRotation = Body.transform.rotation;
+        }
+
+        public Material GetMaterial() {
+            return Colors[SelectedColor];
+        }
+
+        public static void ApplyColorTo(int ColorID, GameObject Target) {
+            Material Appliable = ColorCopies[ColorID];
+            Renderer[] Renderers = Target.GetComponentsInChildren<Renderer>();
+            int RendererCount = Renderers.Length;
+            for (int i = 0; i < RendererCount; ++i)
+                Renderers[i].material = Appliable;
+        }
+
+        public void SelectColor(int ColorID) {
+            ApplyColorTo(ColorID, Body);
+            SelectedColor = ColorID;
         }
 
         /// <summary>
@@ -91,6 +119,7 @@ namespace Menus.Customization {
                 }
             }
             PlayerPrefs.SetString("Ship", Serialization.ToString());
+            PlayerPrefs.SetInt("ShipColor", SelectedColor);
             PlayerPrefs.Save();
         }
 
@@ -125,6 +154,7 @@ namespace Menus.Customization {
                 AttachmentTransform.localEulerAngles = EulerAngles;
                 AttachmentTransform.localScale = new Vector3(1, 1, 1);
             }
+            ApplyColorTo(PlayerPrefs.GetInt("ShipColor", 0), Target);
         }
 
         /// <summary>
