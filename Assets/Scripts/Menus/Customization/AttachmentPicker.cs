@@ -28,7 +28,7 @@ namespace Menus.Customization {
         /// </summary>
         public void Pick() {
             if (!Customization.Attachment.PickedUp)
-                Instantiate(Attachment);
+                Instantiate(Attachment).GetComponent<Attachment>().Body = Customize.Instance.Body;
         }
 
         void Start() {
