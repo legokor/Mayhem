@@ -125,8 +125,10 @@ public class PlayerEntity : Singleton<PlayerEntity> {
 
     void Update() {
         if (Lives == 0) {
-            if (!GameOverScreen.activeInHierarchy)
+            if (!GameOverScreen.activeInHierarchy) {
                 GameOverScreen.SetActive(true);
+                GameOverScreen.GetComponent<GameOverMenu>().DisplayScore(Score);
+            }
             return;
         }
         Weapon.Firing = AutoFire; // Firing to default
