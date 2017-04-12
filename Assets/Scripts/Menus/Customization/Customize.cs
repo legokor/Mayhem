@@ -40,6 +40,7 @@ namespace Menus.Customization {
             AttachmentCopies = (GameObject[])Attachments.Clone();
             ColorCopies = (Material[])Colors.Clone();
             StartRotation = Body.transform.rotation;
+            SelectedColor = PlayerPrefs.GetInt("ShipColor", 0);
         }
 
         public Material GetMaterial() {
