@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -19,7 +20,7 @@ namespace Menus {
         public Transform MenuTarget, CustomizeTarget, SettingsTarget, CalibrationTarget;
         public LerpToPlace MenuObject, LevelSelectorObject;
         public GameObject MenuPlace, MenuHide, LevelSelectorPlace, LevelSelectorHide, ExitButton;
-        public Text SketchModeStatus, MotionBlurStatus, LeapCalibrationText;
+        public Text SketchModeStatus, MotionBlurStatus, LeapCalibrationText, CavernText;
 
         /// <summary>
         /// Selected level.
@@ -102,6 +103,17 @@ namespace Menus {
                 Calibration.Instance.gameObject.SetActive(false);
                 Calibration.Instance.CalibrationResult += ApplyCalibration;
                 Settings.LeapSetupXY();
+                StringBuilder CavernOut = new StringBuilder("Cavern output: ");
+                int Regular = 0, LFE = 0, Ceiling = 0, Floor = 0, Channels = AudioListener3D.Channels.Length;
+                for (int i = 0; i < Channels; ++i)
+                    if (AudioListener3D.Subwoofers[i]) ++LFE;
+                    else if (AudioListener3D.Channels[i].x == 0) ++Regular;
+                    else if (AudioListener3D.Channels[i].x < 0) ++Ceiling;
+                    else if (AudioListener3D.Channels[i].x > 0) ++Floor;
+                CavernOut.Append(Regular).Append('.').Append(LFE);
+                if (Ceiling > 0 || Floor > 0) CavernOut.Append('.').Append(Ceiling);
+                if (Floor > 0) CavernOut.Append('.').Append(Floor);
+                CavernText.text = CavernOut.ToString();
             }
         }
 
