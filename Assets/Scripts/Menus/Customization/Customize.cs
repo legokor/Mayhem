@@ -8,6 +8,8 @@ namespace Menus.Customization {
     /// </summary>
     [AddComponentMenu("Menus / Customization / Customize")]
     public class Customize : Singleton<Customize> {
+        [Tooltip("Ship rotation sensitivity.")]
+        public float Sensitivity = 1f;
         [Tooltip("The ship's main body to build on.")]
         public GameObject Body;
         [Tooltip("Possible components to attach.")]
@@ -170,7 +172,7 @@ namespace Menus.Customization {
         void Update() {
             Vector2 PointerPos = LeapMouse.Instance.ScreenPosition();
             if (LeapMouse.Instance.Action()) {
-                Vector2 Difference = LastPointerPos - PointerPos;
+                Vector2 Difference = (LastPointerPos - PointerPos) * Sensitivity;
                 Body.transform.rotation = Quaternion.Euler(Camera.main.transform.up * Difference.x) *
                                           Quaternion.Euler(Camera.main.transform.right * Difference.y) * Body.transform.rotation;
                 Vector3 EulerAngles = Body.transform.localEulerAngles;
