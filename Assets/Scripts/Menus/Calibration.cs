@@ -9,10 +9,16 @@ namespace Menus {
         public float DisplayScale = .01f;
 
         public delegate void Result(Vector3 Minimums, Vector3 Maximums);
+        /// <summary>
+        /// Called when the Leap Motion bounds have changed.
+        /// </summary>
         public Result CalibrationResult;
 
         GameObject Cube, ResultCube;
 
+        /// <summary>
+        /// Creates a cube GameObject in a given color.
+        /// </summary>
         GameObject CreateCube(Color color) {
             GameObject Creation = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Creation.transform.parent = transform;
@@ -34,11 +40,17 @@ namespace Menus {
             ResultCube.transform.localScale = ScaleForResult(Settings.LeapLowerBounds, Settings.LeapUpperBounds);
         }
 
+        /// <summary>
+        /// Calculates the center of the Leap Motion bounds.
+        /// </summary>
         Vector3 PositionForResult(Vector3 Minimums, Vector3 Maximums) {
             return new Vector3((Minimums.x + Maximums.x) * .5f / transform.lossyScale.x, (Minimums.y + Maximums.y) * .5f / transform.lossyScale.y,
                 (Minimums.z + Maximums.z) * .5f / transform.lossyScale.z) * DisplayScale;
         }
 
+        /// <summary>
+        /// Calculates the dimensions of the Leap Motion bounds.
+        /// </summary>
         Vector3 ScaleForResult(Vector3 Minimums, Vector3 Maximums) {
             return new Vector3((Maximums.x - Minimums.x) / transform.lossyScale.x, (Maximums.y - Minimums.y) / transform.lossyScale.y,
                 (Maximums.z - Minimums.z) / transform.lossyScale.z) * DisplayScale;

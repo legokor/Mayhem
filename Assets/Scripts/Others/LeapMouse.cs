@@ -79,7 +79,7 @@ public class LeapMouse : Singleton<LeapMouse> {
             }
             GUI.DrawTexture(new Rect(DrawStartPos, MouseSize * (LastFingerCount != 0 ? 1 : .8f)), MouseIcon);
         }
-	}
+    }
 
     void Update() {
         HandPosition = LeapMotion.Instance.PalmOnScreenXY();

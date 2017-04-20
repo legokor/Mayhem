@@ -8,6 +8,10 @@ namespace Menus {
     public class GameOverMenu : MonoBehaviour {
         public Text Score, ScoreShadow;
 
+        /// <summary>
+        /// Show the player's score on the Game Over UI.
+        /// </summary>
+        /// <param name="Score">The player's score</param>
         public void DisplayScore(int Score) {
             int TopScore = Profile.TopScore;
             if (Score > TopScore) {
@@ -18,10 +22,16 @@ namespace Menus {
             }
         }
 
+        /// <summary>
+        /// Play the same level again.
+        /// </summary>
         public void Retry() {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
+        /// <summary>
+        /// Exit to the main menu.
+        /// </summary>
         public void Menu() {
             SceneManager.LoadScene(0);
         }
