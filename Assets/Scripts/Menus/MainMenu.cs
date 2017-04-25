@@ -104,15 +104,19 @@ namespace Menus {
                 Calibration.Instance.CalibrationResult += ApplyCalibration;
                 Settings.LeapSetupXY();
                 StringBuilder CavernOut = new StringBuilder("Cavern output: ");
-                int Regular = 0, LFE = 0, Ceiling = 0, Floor = 0, Channels = AudioListener3D.Channels.Length;
-                for (int i = 0; i < Channels; ++i)
-                    if (AudioListener3D.Subwoofers[i]) ++LFE;
-                    else if (AudioListener3D.Channels[i].x == 0) ++Regular;
-                    else if (AudioListener3D.Channels[i].x < 0) ++Ceiling;
-                    else if (AudioListener3D.Channels[i].x > 0) ++Floor;
-                CavernOut.Append(Regular).Append('.').Append(LFE);
-                if (Ceiling > 0 || Floor > 0) CavernOut.Append('.').Append(Ceiling);
-                if (Floor > 0) CavernOut.Append('.').Append(Floor);
+                if (AudioListener3D.Current.HeadphoneVirtualizer)
+                    CavernOut.Append(" headphone");
+                else {
+                    int Regular = 0, LFE = 0, Ceiling = 0, Floor = 0, Channels = AudioListener3D.Channels.Length;
+                    for (int i = 0; i < Channels; ++i)
+                        if (AudioListener3D.Subwoofers[i]) ++LFE;
+                        else if (AudioListener3D.Channels[i].x == 0) ++Regular;
+                        else if (AudioListener3D.Channels[i].x < 0) ++Ceiling;
+                        else if (AudioListener3D.Channels[i].x > 0) ++Floor;
+                    CavernOut.Append(Regular).Append('.').Append(LFE);
+                    if (Ceiling > 0 || Floor > 0) CavernOut.Append('.').Append(Ceiling);
+                    if (Floor > 0) CavernOut.Append('.').Append(Floor);
+                }
                 CavernText.text = CavernOut.ToString();
             }
         }
