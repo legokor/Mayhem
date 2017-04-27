@@ -162,7 +162,7 @@ public class PlayerEntity : Singleton<PlayerEntity> {
             Weapon.Firing |= Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0);
         }
         MovePos = Mathf.Clamp(MovePos + VerticalMovement * Time.deltaTime * 100f, -55, 55);
-        SidePos = Mathf.Clamp(SidePos + HorizontalMovement * Time.deltaTime * 100f, -75, 75);
+        SidePos = Mathf.Clamp(SidePos + HorizontalMovement * Time.deltaTime * 100f, -80, 80);
         transform.position = new Vector3(SidePos, 25, MovePos + MapHandler.Instance.MapPos);
         transform.rotation = Quaternion.Euler(0, 0, -HorizontalMovement * 15f);
     }
