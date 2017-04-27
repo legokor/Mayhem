@@ -19,7 +19,7 @@ namespace Weapons {
             projectile.Player = true;
             projectile.Damage = Level + 1;
             projectile.WeaponKind = WeaponKinds.Laser;
-            projectile.transform.localScale = new Vector3(Level, 1, Level);
+            projectile.transform.localScale = new Vector3(Level, 1, 1);
             PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioBeam, .5f);
         }
     }

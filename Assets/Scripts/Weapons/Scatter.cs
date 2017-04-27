@@ -23,7 +23,7 @@ namespace Weapons {
                 projectile.Player = true;
                 projectile.Damage = 2;
                 projectile.WeaponKind = WeaponKinds.Scatter;
-                projectile.GetComponentInChildren<Renderer>().material.color = new Color(1, .5f, 0);
+                projectile.Repaint(new Color(1, .5f, 0));
             }
             PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioScatter, .5f);
         }

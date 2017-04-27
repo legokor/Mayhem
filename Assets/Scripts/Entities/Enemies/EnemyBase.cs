@@ -72,7 +72,7 @@ namespace Enemies {
                     projectile.Damage = Damage;
                     projectile.Speed = 75;
                     projectile.WeaponKind = WeaponKind;
-                    projectile.GetComponentInChildren<Renderer>().material.color = WeaponBase.WeaponKindColor(WeaponKind);
+                    projectile.Repaint(WeaponBase.WeaponKindColor(WeaponKind));
                     Cooldown += ShootingSpeed;
                 }
             }

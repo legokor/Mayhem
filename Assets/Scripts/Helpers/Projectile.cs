@@ -25,5 +25,13 @@ namespace Helpers {
             } else
                 transform.position += transform.forward * Time.deltaTime * Speed;
         }
+
+        public void Repaint(Color TargetColor) {
+            ParticleSystem Particles = GetComponent<ParticleSystem>();
+            ParticleSystem.MainModule ParticleMain = Particles.main;
+            ParticleMain.startColor = TargetColor;
+            Particles.Clear();
+            Particles.Play();
+        }
     }
 }

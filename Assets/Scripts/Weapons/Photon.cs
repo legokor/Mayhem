@@ -22,8 +22,9 @@ namespace Weapons {
                 projectile.Player = true;
                 projectile.Damage = 3;
                 projectile.WeaponKind = WeaponKinds.Photon;
-                projectile.GetComponentInChildren<Renderer>().material.color = Color.green;
-                projectile.transform.localScale += new Vector3(1, 1, 0);
+                projectile.Repaint(Color.green);
+                ParticleSystem.MainModule ParticleMain = projectile.GetComponent<ParticleSystem>().main;
+                ParticleMain.startSizeXMultiplier *= 2;
             }
             PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioPhoton, .5f);
         }
