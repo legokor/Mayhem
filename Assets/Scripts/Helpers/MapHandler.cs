@@ -153,8 +153,12 @@ namespace Helpers {
                             }
                         }
                         int Placing = Random.Range(0, PlaceCount);
-                        Instantiate(GroundObjects[ObjID], new Vector3(PlausiblePlaces[Placing].x * 5 + GroundObjectSizes[ObjID].x / 2 - 100, 0,
-                            PlausiblePlaces[Placing].y * 5 + GroundObjectSizes[ObjID].y / 2 + SpawnDistance), Random.value < .5f ? Utilities.ForwardRot : Utilities.Backwards);
+                        Vector2 ObjSize = GroundObjectSizes[ObjID];
+                        Instantiate(GroundObjects[ObjID],
+                            new Vector3(PlausiblePlaces[Placing].x * 5 + ObjSize.x / 2 - 100, 0, PlausiblePlaces[Placing].y * 5 + ObjSize.y / 2 + SpawnDistance),
+                            ObjSize.x == ObjSize.y && Random.value < .5f ? // Random direction
+                                (Random.value < .5f ? Utilities.LeftRot : Utilities.RightRot) : // For square objects, it could be left or right, too
+                                (Random.value < .5f ? Utilities.ForwardRot : Utilities.Backwards));
                         for (int i = (int)PlausiblePlaces[Placing].x; i < (int)(PlausiblePlaces[Placing].x + Sizes.x); i++)
                             for (int j = (int)PlausiblePlaces[Placing].y; j < (int)(PlausiblePlaces[Placing].y + Sizes.y); j++)
                                 Filling[i, j] = true;
