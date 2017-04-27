@@ -50,7 +50,7 @@ namespace Weapons {
         /// </summary>
         protected float Cooldown = .1f;
         /// <summary>
-        /// The time when the weapon can shoot again.
+        /// Time remaining for the weapon to shoot again.
         /// </summary>
         float NextShot = 0;
 
@@ -132,9 +132,10 @@ namespace Weapons {
         /// Shoot if able to.
         /// </summary>
         void Update() {
-            if (Time.time >= NextShot && Firing) {
+            NextShot -= Time.deltaTime;
+            if (NextShot <= 0 && Firing) {
                 Shoot();
-                NextShot = Time.time + Cooldown;
+                NextShot += Cooldown;
             }
         }
     }
