@@ -109,7 +109,7 @@ namespace Menus {
                 else {
                     int Regular = 0, LFE = 0, Ceiling = 0, Floor = 0, Channels = AudioListener3D.Channels.Length;
                     for (int i = 0; i < Channels; ++i)
-                        if (AudioListener3D.Subwoofers[i]) ++LFE;
+                        if (AudioListener3D.Channels[i].LFE) ++LFE;
                         else if (AudioListener3D.Channels[i].x == 0) ++Regular;
                         else if (AudioListener3D.Channels[i].x < 0) ++Ceiling;
                         else if (AudioListener3D.Channels[i].x > 0) ++Floor;
