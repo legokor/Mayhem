@@ -26,11 +26,11 @@ namespace Weapons {
             if (ActualCooldown <= 0) {
                 ActualCooldown += .0625f; // The beam actually hits 16 times a second
                 projectile.Damage = Level + 1;
+                PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioBeam, .5f);
             } else
                 projectile.Damage = 0;
             projectile.WeaponKind = WeaponKinds.Laser;
             projectile.transform.localScale = new Vector3(Level, 1, 1);
-            PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioBeam, .5f);
         }
     }
 }
