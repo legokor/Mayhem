@@ -53,25 +53,6 @@ namespace Menus {
             NewObj.AddComponent<TimedDespawner>().Timer = 1;
         }
 
-        void Save() {
-            PlayerPrefs.SetInt("Sketch", Convert.ToInt32(Settings.SketchGraphics));
-            PlayerPrefs.SetInt("MotionBlur", Convert.ToInt32(Settings.MotionBlur));
-            PlayerPrefs.SetFloat("LeapMinX", Settings.LeapLowerBounds.x);
-            PlayerPrefs.SetFloat("LeapMinY", Settings.LeapLowerBounds.y);
-            PlayerPrefs.SetFloat("LeapMinZ", Settings.LeapLowerBounds.z);
-            PlayerPrefs.SetFloat("LeapMaxX", Settings.LeapUpperBounds.x);
-            PlayerPrefs.SetFloat("LeapMaxY", Settings.LeapUpperBounds.y);
-            PlayerPrefs.SetFloat("LeapMaxZ", Settings.LeapUpperBounds.z);
-            PlayerPrefs.Save();
-        }
-
-        void Load() {
-            Settings.SketchGraphics = Convert.ToBoolean(PlayerPrefs.GetInt("Sketch", 0));
-            Settings.MotionBlur = Convert.ToBoolean(PlayerPrefs.GetInt("MotionBlur", 1));
-            Settings.LeapLowerBounds = new Vector3(PlayerPrefs.GetFloat("LeapMinX", -200), PlayerPrefs.GetFloat("LeapMinY", 100), PlayerPrefs.GetFloat("LeapMinZ", -112.5f));
-            Settings.LeapUpperBounds = new Vector3(PlayerPrefs.GetFloat("LeapMaxX", 200), PlayerPrefs.GetFloat("LeapMaxY", 300), PlayerPrefs.GetFloat("LeapMaxZ", 112.5f));
-        }
-
         void ResetGraphics() {
             QualitySettings.SetQualityLevel(Convert.ToInt32(Settings.SketchGraphics));
             SketchModeStatus.text = "Sketch graphics (" + (Settings.SketchGraphics ? "on" : "off") + ")";
@@ -82,11 +63,6 @@ namespace Menus {
             Settings.LeapLowerBounds = Minimums;
             Settings.LeapUpperBounds = Maximums;
             Settings.LeapSetupXY();
-        }
-
-        void Awake() {
-            if (LevelSelectorObject) // This is the menu
-                Load(); // Load all settings, something might need them
         }
 
         void Start() {
@@ -119,10 +95,6 @@ namespace Menus {
                 }
                 CavernText.text = CavernOut.ToString();
             }
-        }
-
-        void OnDestroy() {
-            Save();
         }
 
         public void Play() {

@@ -42,7 +42,7 @@ namespace Menus.Customization {
             AttachmentCopies = (GameObject[])Attachments.Clone();
             ColorCopies = (Material[])Colors.Clone();
             StartRotation = Body.transform.rotation;
-            SelectedColor = PlayerPrefs.GetInt("ShipColor", 0);
+            SelectedColor = Profile.GetInt("ShipColor", 0);
         }
 
         public Material GetMaterial() {
@@ -121,9 +121,8 @@ namespace Menus.Customization {
                     Serialization.Append(SerializeFloat(Angles.z)).Append(";");
                 }
             }
-            PlayerPrefs.SetString("Ship", Serialization.ToString());
-            PlayerPrefs.SetInt("ShipColor", SelectedColor);
-            PlayerPrefs.Save();
+            Profile.SetString("Ship", Serialization.ToString());
+            Profile.SetInt("ShipColor", SelectedColor);
         }
 
         /// <summary>
@@ -139,7 +138,7 @@ namespace Menus.Customization {
         /// Loads the saved player ship on a given GameObject.
         /// </summary>
         public static void DeserializeTo(GameObject Target) {
-            string[] Ship = PlayerPrefs.GetString("Ship", "").Split(';');
+            string[] Ship = Profile.GetString("Ship", "").Split(';');
             int ShipPos = 0, MaxPos = Ship.Length;
             while (MaxPos - ShipPos >= 7) {
                 string Name = Ship[ShipPos++];
@@ -157,7 +156,7 @@ namespace Menus.Customization {
                 AttachmentTransform.localEulerAngles = EulerAngles;
                 AttachmentTransform.localScale = new Vector3(1, 1, 1);
             }
-            ApplyColorTo(PlayerPrefs.GetInt("ShipColor", 0), Target);
+            ApplyColorTo(Profile.GetInt("ShipColor", 0), Target);
         }
 
         /// <summary>
