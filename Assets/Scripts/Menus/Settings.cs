@@ -6,6 +6,15 @@ namespace Menus {
     /// </summary>
     public static class Settings {
         /// <summary>
+        /// Enable background music.
+        /// </summary>
+        static bool? _Music = null;
+        public static bool Music {
+            get { return _Music.HasValue ? _Music.Value : (_Music = Profile.GetBool("Music", true)).Value; }
+            set { Profile.SetBool("Music", (_Music = value).Value); }
+        }
+
+        /// <summary>
         /// Dumbed down graphics with Vsync for the lowest system reuqirements.
         /// </summary>
         public static bool SketchGraphics {

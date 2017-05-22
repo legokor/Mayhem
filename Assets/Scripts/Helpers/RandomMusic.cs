@@ -3,6 +3,8 @@ using System;
 
 using Cavern;
 
+using Menus;
+
 namespace Helpers {
     /// <summary>
     /// Picks and plays a random music from the given array, and does this again after it's finished.
@@ -22,7 +24,6 @@ namespace Helpers {
         /// The audio source to play the music on.
         /// </summary>
         AudioSource3D Source;
-
         /// <summary>
         /// Time to wait before starting the first music. Leave some time to the scene to initialize.
         /// </summary>
@@ -92,9 +93,9 @@ namespace Helpers {
                 InitialTimeout -= Time.deltaTime;
                 return;
             }
-            if (Input.GetKeyDown(Skip)) // Trigger a skip by stopping the playback
+            if (Input.GetKeyDown(Skip) || !Settings.Music) // Trigger a skip by stopping the playback
                 Source.IsPlaying = false;
-            if (!Source.IsPlaying) { // Play the next song if nothing is playing (either finished or interrupted)
+            if (Settings.Music && !Source.IsPlaying) { // Play the next song if nothing is playing (either finished or interrupted)
                 // Don't pick the same song again = exclude the last, and if the now playing is picked, use the last
                 int Pick = UnityEngine.Random.Range(0, Files.Length - Convert.ToInt32(Source.clip != null));
                 if (Files[Pick] == Source.clip)

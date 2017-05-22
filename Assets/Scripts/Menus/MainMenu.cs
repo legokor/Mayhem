@@ -20,7 +20,7 @@ namespace Menus {
         public Transform MenuTarget, CustomizeTarget, SettingsTarget, CalibrationTarget;
         public LerpToPlace MenuObject, LevelSelectorObject;
         public GameObject MenuPlace, MenuHide, LevelSelectorPlace, LevelSelectorHide, ExitButton;
-        public Text SketchModeStatus, MotionBlurStatus, LeapCalibrationText, CavernText;
+        public Text MusicText, SketchModeStatus, MotionBlurStatus, LeapCalibrationText, CavernText;
 
         /// <summary>
         /// Selected level.
@@ -53,10 +53,14 @@ namespace Menus {
             NewObj.AddComponent<TimedDespawner>().Timer = 1;
         }
 
-        void ResetGraphics() {
-            QualitySettings.SetQualityLevel(Convert.ToInt32(Settings.SketchGraphics));
-            SketchModeStatus.text = "Sketch graphics (" + (Settings.SketchGraphics ? "on" : "off") + ")";
-            MotionBlurStatus.text = "Motion blur (" + (Settings.MotionBlur ? "on" : "off") + ")";
+        void ResetSettings() {
+            MusicText.text = "Music" + (Settings.Music ? " (on)" : " (off)");
+            bool Sketch = Settings.SketchGraphics;
+            int TargetLevel = Convert.ToInt32(Sketch);
+            if (QualitySettings.GetQualityLevel() != TargetLevel)
+                QualitySettings.SetQualityLevel(TargetLevel);
+            SketchModeStatus.text = "Sketch graphics" + (Sketch ? " (on)" : " (off)");
+            MotionBlurStatus.text = "Motion blur" + (Settings.MotionBlur ? " (on)" : " (off)");
         }
 
         void ApplyCalibration(Vector3 Minimums, Vector3 Maximums) {
@@ -69,7 +73,7 @@ namespace Menus {
             if (LevelSelectorObject) { // This is the menu
                 if (KioskMode)
                     Destroy(ExitButton);
-                ResetGraphics();
+                ResetSettings();
                 if (!LeapMotion.Instance.Connected) {
                     LeapCalibrationText.text = "Leap Motion not found";
                     LeapCalibrationText.gameObject.GetComponent<Button>().interactable = false;
@@ -149,15 +153,21 @@ namespace Menus {
             Application.Quit();
         }
 
+        public void Music(GameObject Caller) {
+            Settings.Music = !Settings.Music;
+            ResetSettings();
+            PlaySoundOn(Caller);
+        }
+
         public void SketchMode(GameObject Caller) {
             Settings.SketchGraphics = !Settings.SketchGraphics;
-            ResetGraphics();
+            ResetSettings();
             PlaySoundOn(Caller);
         }
 
         public void MotionBlur(GameObject Caller) {
             Settings.MotionBlur = !Settings.MotionBlur;
-            ResetGraphics();
+            ResetSettings();
             PlaySoundOn(Caller);
         }
 
