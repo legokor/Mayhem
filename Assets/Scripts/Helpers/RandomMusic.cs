@@ -54,6 +54,7 @@ namespace Helpers {
         /// </summary>
         void Start() {
             Source = GetComponent<AudioSource3D>();
+            Source.SpatialBlend = 0;
             InnerTexture = new Texture2D(1, 1);
             InnerTexture.SetPixel(0, 0, new Color(0, 0, 0, .25f));
             InnerTexture.Apply();
