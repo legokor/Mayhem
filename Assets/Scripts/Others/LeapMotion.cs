@@ -53,6 +53,14 @@ public class LeapMotion : Singleton<LeapMotion> {
     }
 
     /// <summary>
+    /// Check if the user is using the controller.
+    /// </summary>
+    /// <returns>True if there are any hands detected</returns>
+    public bool IsUsed() {
+        return Device.Frame().Hands.Count != 0;
+    }
+
+    /// <summary>
     /// Get count of hands.
     /// </summary>
     /// <returns>The number of hands the device detects</returns>

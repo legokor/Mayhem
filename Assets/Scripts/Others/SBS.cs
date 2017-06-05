@@ -16,12 +16,13 @@ public class SBS : MonoBehaviour {
         set {
             if (value == OtherEye)
                 return;
+            if (Holder)
+                Destroy(Holder);
             if (!value) {
                 Destroy(OtherEye.gameObject);
                 Camera.main.rect = new Rect(0, 0, 1, 1);
                 Camera.main.fieldOfView = OldFov;
                 Camera.main.orthographicSize = OldSize;
-                Destroy(Holder);
             } else {
                 OtherEye = new GameObject().AddComponent<Camera>();
                 OtherEye.gameObject.transform.parent = Camera.main.gameObject.transform;
@@ -53,5 +54,15 @@ public class SBS : MonoBehaviour {
             Camera.main.rect = OtherEye.rect;
             OtherEye.rect = Temp;
         }
+    }
+
+    public static Ray StereoRay(Vector3 Position) {
+        Camera c = Camera.main;
+        if (OtherEye) {
+            int HalfWidth = Screen.width / 2;
+            if ((c.rect.x == 0 && Position.x >= HalfWidth) || (c.rect.x != 0 && Position.x < HalfWidth))
+                c = OtherEye;
+        }
+        return c.ScreenPointToRay(Position);
     }
 }

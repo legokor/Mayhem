@@ -37,28 +37,28 @@ public class LeapMouse : Singleton<LeapMouse> {
     /// </summary>
     public static Ray ScreenPointToRay() {
         Vector2 LeapPosition = LeapMotion.Instance.PalmOnScreenXY();
-        return Camera.main.ScreenPointToRay(LeapPosition.x == -1 ? Input.mousePosition : new Vector3(LeapPosition.x, Screen.height - LeapPosition.y));
+        return SBS.StereoRay(LeapMotion.Instance.IsUsed() ? new Vector3(LeapPosition.x, Screen.height - LeapPosition.y) : Input.mousePosition);
     }
 
     /// <summary>
     /// Gets if the user tapped or clicked.
     /// </summary>
     public bool ActionDown() {
-        return HandPosition.x != -1 ? Tapped : Input.GetMouseButtonDown(0);
+        return LeapMotion.Instance.IsUsed() ? Tapped : Input.GetMouseButtonDown(0);
     }
 
     /// <summary>
     /// Gets if the user grabs.
     /// </summary>
     public bool Action() {
-        return HandPosition.x != -1 ? LastFingerCount == 0 : Input.GetMouseButton(0);
+        return LeapMotion.Instance.IsUsed() ? LastFingerCount == 0 : Input.GetMouseButton(0);
     }
 
     /// <summary>
     /// Gets the pointer (mouse or main hand) position on screen.
     /// </summary>
     public Vector2 ScreenPosition() {
-        return HandPosition.x != -1 ? LeapMotion.Instance.PalmOnScreenXY() : new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+        return LeapMotion.Instance.IsUsed() ? LeapMotion.Instance.PalmOnScreenXY() : new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
     }
 
 	void Start() {
@@ -70,7 +70,7 @@ public class LeapMouse : Singleton<LeapMouse> {
     }
 
     void OnGUI() {
-        if (HandPosition.x != -1) {
+        if (LeapMotion.Instance.IsUsed()) {
             Vector2 DrawStartPos = HandPosition;
             if (CenterPointer) {
                 DrawStartPos -= MouseSize * .5f;
@@ -82,18 +82,18 @@ public class LeapMouse : Singleton<LeapMouse> {
     }
 
     void Update() {
-        HandPosition = LeapMotion.Instance.PalmOnScreenXY();
+        HandPosition = ScreenPosition();
         int FingerCount = LeapMotion.Instance.ExtendedFingers();
         Tapped = FingerCount == 0 && LastFingerCount != 0;
             RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector2(HandPosition.x, Screen.height - HandPosition.y)), out hit)) {
+        if (Physics.Raycast(SBS.StereoRay(new Vector2(HandPosition.x, Screen.height - HandPosition.y)), out hit)) {
             Button Hovered = hit.collider.gameObject.GetComponentInChildren<Button>();
             if (Hovered) {
                 if (LastHovered && Hovered != LastHovered)
                     LastHovered.OnPointerExit(RandomPointerEventData);
                 Hovered.OnPointerEnter(RandomPointerEventData);
                 LastHovered = Hovered;
-                if (Tapped)
+                if (ActionDown())
                     Hovered.OnPointerClick(RandomPointerEventData);
             } else if (LastHovered)
                 LastHovered.OnPointerExit(RandomPointerEventData);
