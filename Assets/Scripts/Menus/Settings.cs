@@ -31,6 +31,14 @@ namespace Menus {
         }
 
         /// <summary>
+        /// Enable Side-by-Side 3D.
+        /// </summary>
+        public static bool ThreeD {
+            get { return SBS.Enabled = Profile.GetBool("ThreeD", false); }
+            set { Profile.SetBool("ThreeD", value); SBS.Enabled = value; }
+        }
+
+        /// <summary>
         /// Lower bounds of the Leap Motion control space in all dimensions.
         /// </summary>
         public static Vector3 LeapLowerBounds {

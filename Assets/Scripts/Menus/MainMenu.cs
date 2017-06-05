@@ -20,7 +20,7 @@ namespace Menus {
         public Transform MenuTarget, CustomizeTarget, SettingsTarget, CalibrationTarget;
         public LerpToPlace MenuObject, LevelSelectorObject;
         public GameObject MenuPlace, MenuHide, LevelSelectorPlace, LevelSelectorHide, ExitButton;
-        public Text MusicText, SketchModeStatus, MotionBlurStatus, LeapCalibrationText, CavernText;
+        public Text MusicText, SketchModeStatus, MotionBlurStatus, ThreeDStatus, LeapCalibrationText, CavernText;
 
         /// <summary>
         /// Selected level.
@@ -61,6 +61,7 @@ namespace Menus {
                 QualitySettings.SetQualityLevel(TargetLevel);
             SketchModeStatus.text = "Sketch graphics" + (Sketch ? " (on)" : " (off)");
             MotionBlurStatus.text = "Motion blur" + (Settings.MotionBlur ? " (on)" : " (off)");
+            ThreeDStatus.text = "3D" + (Settings.ThreeD ? " (Side-by-Side)" : " (off)");
         }
 
         void ApplyCalibration(Vector3 Minimums, Vector3 Maximums) {
@@ -167,6 +168,12 @@ namespace Menus {
 
         public void MotionBlur(GameObject Caller) {
             Settings.MotionBlur = !Settings.MotionBlur;
+            ResetSettings();
+            PlaySoundOn(Caller);
+        }
+
+        public void ThreeD(GameObject Caller) {
+            Settings.ThreeD = !Settings.ThreeD;
             ResetSettings();
             PlaySoundOn(Caller);
         }
