@@ -25,9 +25,10 @@ namespace Menus {
         /// <summary>
         /// Enable the motion blur effect.
         /// </summary>
+        static bool? _MotionBlur = null;
         public static bool MotionBlur {
-            get { return Profile.GetBool("MotionBlur", false); }
-            set { Profile.SetBool("MotionBlur", value); }
+            get { return _MotionBlur.HasValue ? _MotionBlur.Value : (_MotionBlur = Profile.GetBool("MotionBlur", false)).Value; }
+            set { Profile.SetBool("MotionBlur", (_MotionBlur = value).Value); }
         }
 
         /// <summary>

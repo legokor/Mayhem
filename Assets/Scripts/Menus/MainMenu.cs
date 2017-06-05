@@ -20,7 +20,7 @@ namespace Menus {
         public Transform MenuTarget, CustomizeTarget, SettingsTarget, CalibrationTarget;
         public LerpToPlace MenuObject, LevelSelectorObject;
         public GameObject MenuPlace, MenuHide, LevelSelectorPlace, LevelSelectorHide, ExitButton;
-        public Text MusicText, SketchModeStatus, MotionBlurStatus, ThreeDStatus, LeapCalibrationText, CavernText;
+        public Text SketchModeStatus, LeapCalibrationText, CavernText;
 
         /// <summary>
         /// Selected level.
@@ -40,28 +40,30 @@ namespace Menus {
         Vector3 LevelSelectorStep;
 
         /// <summary>
+        /// Cached selection sound for static use.
+        /// </summary>
+        static AudioClip _SelectSound;
+
+        /// <summary>
         /// Play a sound at the location of a GameObject.
         /// </summary>
         /// <param name="Obj">Target</param>
-        void PlaySoundOn(GameObject Obj) {
+        public static void PlaySoundOn(GameObject Obj) {
             GameObject NewObj = new GameObject();
             NewObj.transform.position = Obj.transform.position;
             AudioSource3D Source = NewObj.AddComponent<AudioSource3D>();
-            Source.clip = SelectSound;
+            Source.clip = _SelectSound;
             Source.Volume = .33f;
             Source.Play();
             NewObj.AddComponent<TimedDespawner>().Timer = 1;
         }
 
         void ResetSettings() {
-            MusicText.text = "Music" + (Settings.Music ? " (on)" : " (off)");
             bool Sketch = Settings.SketchGraphics;
             int TargetLevel = Convert.ToInt32(Sketch);
             if (QualitySettings.GetQualityLevel() != TargetLevel)
                 QualitySettings.SetQualityLevel(TargetLevel);
             SketchModeStatus.text = "Sketch graphics" + (Sketch ? " (on)" : " (off)");
-            MotionBlurStatus.text = "Motion blur" + (Settings.MotionBlur ? " (on)" : " (off)");
-            ThreeDStatus.text = "3D" + (Settings.ThreeD ? " (Side-by-Side)" : " (off)");
         }
 
         void ApplyCalibration(Vector3 Minimums, Vector3 Maximums) {
@@ -72,6 +74,7 @@ namespace Menus {
 
         void Start() {
             if (LevelSelectorObject) { // This is the menu
+                _SelectSound = SelectSound;
                 if (KioskMode)
                     Destroy(ExitButton);
                 ResetSettings();
@@ -84,21 +87,7 @@ namespace Menus {
                 Calibration.Instance.gameObject.SetActive(false);
                 Calibration.Instance.CalibrationResult += ApplyCalibration;
                 Settings.LeapSetupXY();
-                StringBuilder CavernOut = new StringBuilder("Cavern output: ");
-                if (AudioListener3D.Current.HeadphoneVirtualizer)
-                    CavernOut.Append(" headphone");
-                else {
-                    int Regular = 0, LFE = 0, Ceiling = 0, Floor = 0, Channels = AudioListener3D.Channels.Length;
-                    for (int i = 0; i < Channels; ++i)
-                        if (AudioListener3D.Channels[i].LFE) ++LFE;
-                        else if (AudioListener3D.Channels[i].x == 0) ++Regular;
-                        else if (AudioListener3D.Channels[i].x < 0) ++Ceiling;
-                        else if (AudioListener3D.Channels[i].x > 0) ++Floor;
-                    CavernOut.Append(Regular).Append('.').Append(LFE);
-                    if (Ceiling > 0 || Floor > 0) CavernOut.Append('.').Append(Ceiling);
-                    if (Floor > 0) CavernOut.Append('.').Append(Floor);
-                }
-                CavernText.text = CavernOut.ToString();
+                CavernText.text = "Cavern output: " + AudioListener3D.GetLayoutName();
             }
         }
 
@@ -154,26 +143,8 @@ namespace Menus {
             Application.Quit();
         }
 
-        public void Music(GameObject Caller) {
-            Settings.Music = !Settings.Music;
-            ResetSettings();
-            PlaySoundOn(Caller);
-        }
-
         public void SketchMode(GameObject Caller) {
             Settings.SketchGraphics = !Settings.SketchGraphics;
-            ResetSettings();
-            PlaySoundOn(Caller);
-        }
-
-        public void MotionBlur(GameObject Caller) {
-            Settings.MotionBlur = !Settings.MotionBlur;
-            ResetSettings();
-            PlaySoundOn(Caller);
-        }
-
-        public void ThreeD(GameObject Caller) {
-            Settings.ThreeD = !Settings.ThreeD;
             ResetSettings();
             PlaySoundOn(Caller);
         }
