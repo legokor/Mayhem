@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 namespace Menus {
     /// <summary>
@@ -8,28 +9,33 @@ namespace Menus {
         /// <summary>
         /// Enable background music.
         /// </summary>
-        static bool? _Music = null;
         public static bool Music {
             get { return _Music.HasValue ? _Music.Value : (_Music = Profile.GetBool("Music", true)).Value; }
             set { Profile.SetBool("Music", (_Music = value).Value); }
         }
+        static bool? _Music = null;
 
         /// <summary>
         /// Dumbed down graphics with Vsync for the lowest system reuqirements.
         /// </summary>
         public static bool SketchGraphics {
-            get { return Profile.GetBool("Sketch", false); }
-            set { Profile.SetBool("Sketch", value); }
+            get { bool Level = Profile.GetBool("Sketch", false); SetGraphics(Level); return Level; }
+            set { Profile.SetBool("Sketch", value); SetGraphics(value); }
+        }
+        static void SetGraphics(bool Sketch) {
+            int TargetLevel = Convert.ToInt32(Sketch);
+            if (QualitySettings.GetQualityLevel() != TargetLevel)
+                QualitySettings.SetQualityLevel(TargetLevel);
         }
 
         /// <summary>
         /// Enable the motion blur effect.
         /// </summary>
-        static bool? _MotionBlur = null;
         public static bool MotionBlur {
             get { return _MotionBlur.HasValue ? _MotionBlur.Value : (_MotionBlur = Profile.GetBool("MotionBlur", false)).Value; }
             set { Profile.SetBool("MotionBlur", (_MotionBlur = value).Value); }
         }
+        static bool? _MotionBlur = null;
 
         /// <summary>
         /// Enable Side-by-Side 3D.

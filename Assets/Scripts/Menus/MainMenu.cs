@@ -17,10 +17,10 @@ namespace Menus {
         [Tooltip("Give access to all unlockables and hide the Exit button.")]
         public bool KioskMode = false;
 
-        public Transform MenuTarget, CustomizeTarget, SettingsTarget, CalibrationTarget;
+        public Transform MenuTarget, CustomizeTarget, SettingsTarget, CalibrationTarget, AboutTarget;
         public LerpToPlace MenuObject, LevelSelectorObject;
         public GameObject MenuPlace, MenuHide, LevelSelectorPlace, LevelSelectorHide, ExitButton;
-        public Text SketchModeStatus, LeapCalibrationText, CavernText;
+        public Text LeapCalibrationText, CavernText;
 
         /// <summary>
         /// Selected level.
@@ -58,14 +58,6 @@ namespace Menus {
             NewObj.AddComponent<TimedDespawner>().Timer = 1;
         }
 
-        void ResetSettings() {
-            bool Sketch = Settings.SketchGraphics;
-            int TargetLevel = Convert.ToInt32(Sketch);
-            if (QualitySettings.GetQualityLevel() != TargetLevel)
-                QualitySettings.SetQualityLevel(TargetLevel);
-            SketchModeStatus.text = "Sketch graphics" + (Sketch ? " (on)" : " (off)");
-        }
-
         void ApplyCalibration(Vector3 Minimums, Vector3 Maximums) {
             Settings.LeapLowerBounds = Minimums;
             Settings.LeapUpperBounds = Maximums;
@@ -77,7 +69,6 @@ namespace Menus {
                 _SelectSound = SelectSound;
                 if (KioskMode)
                     Destroy(ExitButton);
-                ResetSettings();
                 if (!LeapMotion.Instance.Connected) {
                     LeapCalibrationText.text = "Leap Motion not found";
                     LeapCalibrationText.gameObject.GetComponent<Button>().interactable = false;
@@ -143,15 +134,14 @@ namespace Menus {
             Application.Quit();
         }
 
-        public void SketchMode(GameObject Caller) {
-            Settings.SketchGraphics = !Settings.SketchGraphics;
-            ResetSettings();
-            PlaySoundOn(Caller);
-        }
-
         public void LeapCalibration(GameObject Caller) {
             CameraTarget = CalibrationTarget;
             Calibration.Instance.gameObject.SetActive(true);
+            PlaySoundOn(Caller);
+        }
+
+        public void AboutButton(GameObject Caller) {
+            CameraTarget = AboutTarget;
             PlaySoundOn(Caller);
         }
 
@@ -165,7 +155,7 @@ namespace Menus {
                 Calibration.Instance.gameObject.AddComponent<TimedDisabler>().Timer = .25f;
                 CameraTarget = SettingsTarget;
             } else
-                CameraTarget = MenuTarget;
+                CameraTarget = CameraTarget == AboutTarget ? SettingsTarget : MenuTarget;
             MenuObject.Target = MenuPlace;
             LevelSelectorObject.transform.parent.gameObject.AddComponent<TimedDisabler>().Timer = .25f;
             LevelSelectorPlace.transform.position = LevelSelectorHide.transform.position;
