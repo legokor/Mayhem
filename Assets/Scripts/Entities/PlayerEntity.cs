@@ -101,7 +101,7 @@ public class PlayerEntity : Singleton<PlayerEntity> {
     }
 
     void Start() {
-        AudioListener3D.EnvironmentSize = new Vector3(100, 100, 100);
+        AudioListener3D.EnvironmentSize *= 10;
     }
 
     void OnGUI() {
