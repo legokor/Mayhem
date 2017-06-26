@@ -46,6 +46,15 @@ namespace Menus {
         }
 
         /// <summary>
+        /// Third person mode instead of a top-down camera.
+        /// </summary>
+        public static bool FollowerCamera {
+            get { return _FollowerCamera.HasValue ? _FollowerCamera.Value : (_FollowerCamera = Profile.GetBool("FollowerCamera", true)).Value; }
+            set { Profile.SetBool("FollowerCamera", (_FollowerCamera = value).Value); }
+        }
+        static bool? _FollowerCamera = null;
+
+        /// <summary>
         /// Lower bounds of the Leap Motion control space in all dimensions.
         /// </summary>
         public static Vector3 LeapLowerBounds {

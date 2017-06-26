@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Enemies;
+using Menus;
 
 namespace Helpers {
     /// <summary>
@@ -29,6 +30,10 @@ namespace Helpers {
         public int DronesPerWave = 6;
         [Tooltip("Time between creating new waves.")]
         public float WaveCountdown = 8;
+        [Tooltip("Camera distance from the player if follower camera is enabled.")]
+        public float FollowDistance = 100.0f;
+        [Tooltip("Camera adaptation quickness if follower camera is enabled.")]
+        public float FollowSpeed = 5.0f;
 
         /// <summary>
         /// Scrolled distance.
@@ -101,9 +106,16 @@ namespace Helpers {
         /// <summary>
         /// Scroll and spawn environment and enemies each frame.
         /// </summary>
-        void Update() {
+        void LateUpdate() {
             MapPos += ScrollingSpeed * Time.deltaTime; // Scrolling
-            Camera.main.transform.position = new Vector3(0, 150, MapPos); // Camera movement
+            if (Settings.FollowerCamera) {
+                Transform PlayerTransform = PlayerEntity.Instance.transform, CamTransform = Camera.main.transform;
+                Vector3 CamTarget = PlayerTransform.position - PlayerTransform.forward * FollowDistance + PlayerTransform.up * (FollowDistance * .75f);
+                CamTransform.position = Vector3.Lerp(CamTransform.position, CamTarget, Time.deltaTime * FollowSpeed);
+                CamTransform.LookAt(PlayerTransform.position);
+            } else {
+                Camera.main.transform.position = new Vector3(0, 150, MapPos); // Camera movement
+            }
             transform.position = new Vector3(0, 0, Mathf.Round(MapPos / 100) * 100); // Drag the ground along, don't spawn new lands
             Difficulty += Time.deltaTime / 10f; // Increase difficulty
             // Environment spawning
