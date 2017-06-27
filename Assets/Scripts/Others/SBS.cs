@@ -4,6 +4,9 @@
 /// Generic Side-by-Side 3D.
 /// </summary>
 public class SBS : MonoBehaviour {
+    public static float EyeDistance = .075f;
+    public static float EyeRotation = 5;
+
     /// <summary>
     /// Extend field of View upwards for the smaller viewports.
     /// </summary>
@@ -26,8 +29,8 @@ public class SBS : MonoBehaviour {
             } else {
                 OtherEye = new GameObject().AddComponent<Camera>();
                 OtherEye.gameObject.transform.parent = Camera.main.gameObject.transform;
-                OtherEye.transform.localPosition = new Vector3(-.075f, 0, 0);
-                OtherEye.transform.localEulerAngles = new Vector3(0, 2, 0);
+                OtherEye.transform.localPosition = new Vector3(-EyeDistance, 0, 0);
+                OtherEye.transform.localEulerAngles = new Vector3(0, EyeRotation, 0);
                 OtherEye.clearFlags = Camera.main.clearFlags;
                 OtherEye.backgroundColor = Camera.main.backgroundColor;
                 OtherEye.rect = new Rect(0, 0, .5f, 1);
