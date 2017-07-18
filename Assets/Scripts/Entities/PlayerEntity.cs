@@ -85,6 +85,7 @@ public class PlayerEntity : Singleton<PlayerEntity> {
                     Instantiate(DeathEffect, transform.position, transform.rotation);
                     PlayerBody.SetActive(false);
                     Weapon.Firing = false;
+                    MapHandler.Instance.enabled = false;
                 }
                 SinceSpawn = 0;
             }
