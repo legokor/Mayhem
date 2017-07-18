@@ -15,9 +15,7 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T> {
     /// </summary>
     public static T Instance {
         get {
-            if (_Instance == null)
-                _Instance = FindObjectOfType<T>();
-            return _Instance;
+            return _Instance ?? (_Instance = FindObjectOfType<T>());
         }
     }
 }
