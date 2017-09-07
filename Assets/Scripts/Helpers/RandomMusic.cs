@@ -13,10 +13,16 @@ namespace Helpers {
     [AddComponentMenu("Helpers / Random Music")]
     [RequireComponent(typeof(AudioSource3D))]
     public class RandomMusic : MonoBehaviour {
-        [Tooltip("Clips to pick a random from.")]
-        public AudioClip[] Files;
-        [Tooltip("Gain for each clip. 1 if not set.")]
-        public float[] Volumes;
+        /// <summary>
+        /// Music clip with replay gain.
+        /// </summary>
+        [Serializable] public struct Music {
+            public AudioClip Clip;
+            public float Gain;
+        }
+
+        [Tooltip("Music to pick a random from.")]
+        public Music[] Files;
         [Tooltip("The key for changing music.")]
         public KeyCode Skip = KeyCode.N;
 
@@ -99,26 +105,22 @@ namespace Helpers {
             if (Settings.Music && !Source.IsPlaying) { // Play the next song if nothing is playing (either finished or interrupted)
                 // Don't pick the same song again = exclude the last, and if the now playing is picked, use the last
                 int Pick = UnityEngine.Random.Range(0, Files.Length - Convert.ToInt32(Source.clip != null));
-                if (Files[Pick] == Source.clip)
+                if (Files[Pick].Clip == Source.clip)
                     Pick = Files.Length - 1;
                 // Disable music picker when files are missing
-                if (!Files[Pick]) {
+                if (!Files[Pick].Clip) {
                     Debug.LogError("Music files are missing.");
                     enabled = false;
                     return;
                 }
                 // Get title
-                Song = (Source.clip = Files[Pick]).name;
+                Song = (Source.clip = Files[Pick].Clip).name;
                 if (Song.Contains(" - ")) {
                     Artist = Song.Substring(0, Song.IndexOf(" - "));
                     Song = Song.Substring(Artist.Length + 3);
                 }
-                // Apply volume
-                if (Volumes.Length > Pick)
-                    Source.Volume = Volumes[Pick];
-                else
-                    Source.Volume = 1;
                 // Finalize
+                Source.Volume = Files[Pick].Gain;
                 DisplayTime = 4;
                 Source.Play();
             }

@@ -11,3 +11,4 @@ Mayhem.csproj
 Mayhem.sln
 Assets/SDK/LeapMotion.meta
 Assets/SDK/LeapMotion/
+obj/
