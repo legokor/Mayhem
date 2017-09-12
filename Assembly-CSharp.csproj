@@ -69,6 +69,7 @@
      <Compile Include="Assets\Scripts\Helpers\Projectile.cs" />
      <Compile Include="Assets\Scripts\Helpers\RandomMusic.cs" />
      <Compile Include="Assets\Scripts\Helpers\RandomSound.cs" />
+     <Compile Include="Assets\Scripts\Helpers\SimpleLookAt.cs" />
      <Compile Include="Assets\Scripts\ImageEffects\CameraMotionBlur.cs" />
      <Compile Include="Assets\Scripts\ImageEffects\PostEffectsBase.cs" />
      <Compile Include="Assets\Scripts\Menus\Calibration.cs" />
