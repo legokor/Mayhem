@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 using Enemies;
 using Menus;
+
+using Random = UnityEngine.Random;
 
 namespace Helpers {
     /// <summary>
@@ -10,12 +13,25 @@ namespace Helpers {
     /// </summary>
     [AddComponentMenu("Helpers / Map Handler")]
     class MapHandler : Singleton<MapHandler> {
+        /// <summary>
+        /// Spawnable object on the ground.
+        /// </summary>
+        [Serializable] public struct GroundObject {
+            public GameObject Prefab;
+            /// <summary>
+            /// The size of the prefab, must be divisible by 5.
+            /// </summary>
+            public Vector2 Size;
+            /// <summary>
+            /// Maximum size increase.
+            /// </summary>
+            public float ScaleVariation;
+        }
+
         [Tooltip("Map scrolling speed.")]
         public float ScrollingSpeed = 25;
         [Tooltip("Objects to spawn on the ground.")]
-        public GameObject[] GroundObjects;
-        [Tooltip("The land size for each ground object. Must be divided by 5.")]
-        public Vector2[] GroundObjectSizes;
+        public GroundObject[] GroundObjects;
         [Tooltip("How many turrets should be spawned on each land block.")]
         public int TurretsPerBlock = 1;
         [Tooltip("Vegetation objects.")]
@@ -135,7 +151,7 @@ namespace Helpers {
                     int Available = 0;
                     bool[] Fitting = new bool[GroundObjects.Length];
                     for (int i = 0; i < Fitting.Length; i++) {
-                        Fitting[i] = !(GroundObjects[i].name == "Turret" && TurretsRemaining == 0) && Fits(GroundObjectSizes[i], Filling);
+                        Fitting[i] = !(GroundObjects[i].Prefab.name == "Turret" && TurretsRemaining == 0) && Fits(GroundObjects[i].Size, Filling);
                         if (Fitting[i]) {
                             NoneFits = false;
                             Available++;
@@ -150,7 +166,7 @@ namespace Helpers {
                         }
                         List<Vector2> PlausiblePlaces = new List<Vector2>();
                         int PlaceCount = 0;
-                        Vector2 Sizes = new Vector2(GroundObjectSizes[ObjID].x / 5, GroundObjectSizes[ObjID].y / 5);
+                        Vector2 Sizes = GroundObjects[ObjID].Size * .2f;
                         for (int i = 0; i < 40 - Sizes.x; i++) {
                             for (int j = 0; j < 30 - Sizes.y; j++) {
                                 bool FitsHere = true;
@@ -165,16 +181,17 @@ namespace Helpers {
                             }
                         }
                         int Placing = Random.Range(0, PlaceCount);
-                        Vector2 ObjSize = GroundObjectSizes[ObjID];
-                        Instantiate(GroundObjects[ObjID],
+                        Vector2 ObjSize = GroundObjects[ObjID].Size;
+                        GameObject NewObject = Instantiate(GroundObjects[ObjID].Prefab,
                             new Vector3(PlausiblePlaces[Placing].x * 5 + ObjSize.x / 2 - 100, 0, PlausiblePlaces[Placing].y * 5 + ObjSize.y / 2 + SpawnDistance),
                             ObjSize.x == ObjSize.y && Random.value < .5f ? // Random direction
                                 (Random.value < .5f ? Utilities.LeftRot : Utilities.RightRot) : // For square objects, it could be left or right, too
                                 (Random.value < .5f ? Utilities.ForwardRot : Utilities.Backwards));
+                        NewObject.transform.localScale *= Random.Range(1, 1 + GroundObjects[ObjID].ScaleVariation);
                         for (int i = (int)PlausiblePlaces[Placing].x; i < (int)(PlausiblePlaces[Placing].x + Sizes.x); i++)
                             for (int j = (int)PlausiblePlaces[Placing].y; j < (int)(PlausiblePlaces[Placing].y + Sizes.y); j++)
                                 Filling[i, j] = true;
-                        if (GroundObjects[ObjID].name == "Turret")
+                        if (GroundObjects[ObjID].Prefab.name == "Turret")
                             TurretsRemaining--;
                     }
                 }

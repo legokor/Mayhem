@@ -6,7 +6,9 @@ namespace Helpers {
     /// </summary>
     [AddComponentMenu("Helpers / Drop Movement")]
     public class DropMovement : MonoBehaviour {
-        /// <summary>Position offset direction.</summary>
+        /// <summary>
+        /// Position offset direction.
+        /// </summary>
         float Angle = 0;
 
         /// <summary>
