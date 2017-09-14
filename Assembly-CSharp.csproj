@@ -66,6 +66,7 @@
      <Compile Include="Assets\Scripts\Helpers\DropMovement.cs" />
      <Compile Include="Assets\Scripts\Helpers\LerpToPlace.cs" />
      <Compile Include="Assets\Scripts\Helpers\MapHandler.cs" />
+     <Compile Include="Assets\Scripts\Helpers\ObjectRotator.cs" />
      <Compile Include="Assets\Scripts\Helpers\Projectile.cs" />
      <Compile Include="Assets\Scripts\Helpers\RandomMusic.cs" />
      <Compile Include="Assets\Scripts\Helpers\RandomSound.cs" />
