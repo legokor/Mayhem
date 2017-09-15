@@ -77,7 +77,7 @@ public class PlayerEntity : Singleton<PlayerEntity> {
             Pickup.PickedUp();
         Projectile proj = col.gameObject.GetComponentInParent<Projectile>();
         if (proj && SinceSpawn >= 3) {
-            Health -= proj.Damage - Convert.ToInt32(proj.WeaponKind == Weapon.Kind);
+            Health -= proj.Damage - (proj.WeaponKind == Weapon.Kind ? 1 : 0);
             if (Health <= 0) {
                 Health += 100;
                 Lives--;

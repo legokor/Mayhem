@@ -20,7 +20,7 @@ namespace Weapons {
                     .GetComponent<Projectile>();
                 Width += 2.5f;
                 projectile.Player = true;
-                projectile.Damage = 3;
+                projectile.Damage = 4; // DPS: level * 40
                 projectile.WeaponKind = WeaponKinds.Photon;
                 projectile.Repaint(Color.green);
                 ParticleSystem.MainModule ParticleMain = projectile.GetComponent<ParticleSystem>().main;

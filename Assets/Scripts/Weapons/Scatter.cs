@@ -21,7 +21,7 @@ namespace Weapons {
                 Angle += AngleAddition;
                 Width += 1.5f;
                 projectile.Player = true;
-                projectile.Damage = 2;
+                projectile.Damage = 2; // DPS: level * 60
                 projectile.WeaponKind = WeaponKinds.Scatter;
                 projectile.Repaint(new Color(1, .5f, 0));
             }

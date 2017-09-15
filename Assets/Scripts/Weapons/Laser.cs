@@ -25,7 +25,7 @@ namespace Weapons {
             ActualCooldown -= Time.deltaTime;
             if (ActualCooldown <= 0) {
                 ActualCooldown += .0625f; // The beam actually hits 16 times a second
-                projectile.Damage = Level + 1;
+                projectile.Damage = (int)(Level * 2.5f) + 2; // DPS: level * 40 + 2
                 PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioBeam, .5f);
             } else
                 projectile.Damage = 0;
