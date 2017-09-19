@@ -87,6 +87,7 @@
      <Compile Include="Assets\Scripts\Others\LeapMotion.cs" />
      <Compile Include="Assets\Scripts\Others\LeapMouse.cs" />
      <Compile Include="Assets\Scripts\Others\SBS.cs" />
+     <Compile Include="Assets\Scripts\Others\SBSMarker.cs" />
      <Compile Include="Assets\Scripts\Others\Singleton.cs" />
      <Compile Include="Assets\Scripts\Others\Utilities.cs" />
      <Compile Include="Assets\Scripts\Weapons\Laser.cs" />
