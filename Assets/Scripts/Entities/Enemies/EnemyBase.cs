@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 
+using Cavern;
+
 using Helpers;
+using Menus;
 using Weapons;
 
 namespace Enemies {
     /// <summary>
     /// Enemy base class. Handles common enemy features, such as shooting and drops.
     /// </summary>
+    [RequireComponent(typeof(AudioSource3D))]
     public abstract class EnemyBase : MonoBehaviour {
         [Tooltip("Each shot that hits the player removes this much health.")]
         public int Damage = 3;
@@ -25,6 +29,8 @@ namespace Enemies {
         bool Dead = false;
         /// <summary>Time until the next shot.</summary>
         float Cooldown;
+        /// <summary>Audio source component.</summary>
+        AudioSource3D Source;
 
         /// <summary>
         /// Called when the enemy is spawned.
@@ -54,6 +60,9 @@ namespace Enemies {
         void Start() {
             Damage = MapHandler.Instance.EnemyDamage;
             Health = MapHandler.Instance.EnemyHealth;
+            Source = GetComponent<AudioSource3D>();
+            if (!Settings.HQAudio)
+                Source.Mute = true;
             Creation(); // Enemy specific setup
             Cooldown = ShootingSpeed; // Initial cooldown
         }
@@ -73,6 +82,8 @@ namespace Enemies {
                     projectile.Speed = 75;
                     projectile.WeaponKind = WeaponKind;
                     projectile.Repaint(WeaponBase.WeaponKindColor(WeaponKind));
+                    if (!Source.Mute)
+                        Source.Play();
                     Cooldown += ShootingSpeed;
                 }
             }
@@ -99,7 +110,7 @@ namespace Enemies {
                     // Spawn loot
                     if (RareDrops.Length != 0 && Random.value < .5f)
                         Instantiate(Random.value < .25f ? RareDrops[Random.Range(0, RareDrops.Length)] : PlayerEntity.Instance.XPPickupObject,
-                            LootSpawnPosition(), new Quaternion(0, 0, 0, 0));
+                            LootSpawnPosition(), Quaternion.identity);
                     // Actually die
                     Instantiate(PlayerEntity.Instance.DeathEffect, transform.position, transform.rotation);
                     MapHandler.Instance.AwardKillScore();

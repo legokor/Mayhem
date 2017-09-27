@@ -13,7 +13,7 @@ namespace Pickups {
 
         public void PickedUp() {
             OnPickup();
-            PlayerEntity.Instance.PlaySound(PickupSound);
+            PlayerEntity.Instance.PlaySound(PickupSound, 1, true);
             Destroy(gameObject);
         }
 

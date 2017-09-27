@@ -10,10 +10,19 @@ namespace Menus {
         /// Enable background music.
         /// </summary>
         public static bool Music {
-            get { return _Music.HasValue ? _Music.Value : (_Music = Profile.GetBool("Music", true)).Value; }
+            get { return _Music ?? (_Music = Profile.GetBool("Music", true)).Value; }
             set { Profile.SetBool("Music", (_Music = value).Value); }
         }
         static bool? _Music = null;
+
+        /// <summary>
+        /// Enable high quality audio.
+        /// </summary>
+        public static bool HQAudio {
+            get { return _HQAudio ?? (_HQAudio = Profile.GetBool("HQAudio", false)).Value; }
+            set { Profile.SetBool("HQAudio", (_HQAudio = value).Value); }
+        }
+        static bool? _HQAudio = null;
 
         /// <summary>
         /// Dumbed down graphics with Vsync for the lowest system reuqirements.
@@ -32,7 +41,7 @@ namespace Menus {
         /// Enable the motion blur effect.
         /// </summary>
         public static bool MotionBlur {
-            get { return _MotionBlur.HasValue ? _MotionBlur.Value : (_MotionBlur = Profile.GetBool("MotionBlur", false)).Value; }
+            get { return _MotionBlur ?? (_MotionBlur = Profile.GetBool("MotionBlur", false)).Value; }
             set { Profile.SetBool("MotionBlur", (_MotionBlur = value).Value); }
         }
         static bool? _MotionBlur = null;
@@ -49,7 +58,7 @@ namespace Menus {
         /// Third person mode instead of a top-down camera.
         /// </summary>
         public static bool FollowerCamera {
-            get { return _FollowerCamera.HasValue ? _FollowerCamera.Value : (_FollowerCamera = Profile.GetBool("FollowerCamera", true)).Value; }
+            get { return _FollowerCamera ?? (_FollowerCamera = Profile.GetBool("FollowerCamera", true)).Value; }
             set { Profile.SetBool("FollowerCamera", (_FollowerCamera = value).Value); }
         }
         static bool? _FollowerCamera = null;

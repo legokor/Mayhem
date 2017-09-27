@@ -23,6 +23,8 @@ public class PlayerEntity : Singleton<PlayerEntity> {
     public bool AutoFire = true;
     [Header("References")]
     public GameObject GameOverScreen;
+    [Tooltip("Map rotator to destroy at death.")]
+    public ObjectRotator Rotator;
 
     AudioSource3D Source;
     WeaponBase Weapon;
@@ -45,8 +47,8 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         Score += 25;
     }
 
-    public void PlaySound(AudioClip Sound, float Volume = 1) {
-        Source.PlayOneShot(Sound, Volume);
+    public void PlaySound(AudioClip Sound, float Volume = 1, bool Static = false) {
+        Source.PlayOneShot(Sound, Volume, Static);
     }
 
     public void WeaponPickup(WeaponKinds Kind) {
@@ -133,6 +135,8 @@ public class PlayerEntity : Singleton<PlayerEntity> {
             if (!GameOverScreen.activeInHierarchy) {
                 GameOverScreen.SetActive(true);
                 GameOverScreen.GetComponent<GameOverMenu>().DisplayScore(Score);
+                if (Rotator)
+                    Destroy(Rotator);
             }
             return;
         }
