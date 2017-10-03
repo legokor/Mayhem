@@ -132,7 +132,7 @@ namespace Helpers {
             } else {
                 Camera.main.transform.position = new Vector3(0, 150, MapPos); // Camera movement
             }
-            transform.position = new Vector3(0, 0, Mathf.Round(MapPos / 100) * 100); // Drag the ground along, don't spawn new lands
+            transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Round(MapPos / 100) * 100); // Drag the ground along, don't spawn new lands
             Difficulty += Time.deltaTime / 10f; // Increase difficulty
             // Environment spawning
             int GroundStep = (int)(MapPos / 100);

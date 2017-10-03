@@ -9,10 +9,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{A63D674D-E29F-1F0E-4CB6-5606EDCC4F7B}</ProjectGuid>
+    <ProjectGuid>{7F32AB24-E0E8-6554-66C8-AAB8DABB2F87}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp-firstpass</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>Assets</BaseDirectory>
@@ -51,61 +51,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Objects\Water\Scripts\Displace.cs" />
-     <Compile Include="Assets\Objects\Water\Scripts\GerstnerDisplace.cs" />
-     <Compile Include="Assets\Objects\Water\Scripts\MeshContainer.cs" />
-     <Compile Include="Assets\Objects\Water\Scripts\PlanarReflection.cs" />
-     <Compile Include="Assets\Objects\Water\Scripts\SpecularLighting.cs" />
-     <Compile Include="Assets\Objects\Water\Scripts\Water.cs" />
-     <Compile Include="Assets\Objects\Water\Scripts\WaterBase.cs" />
-     <Compile Include="Assets\Objects\Water\Scripts\WaterTile.cs" />
-     <Compile Include="Assets\Scripts\Destructors\OOSBottomDespawner.cs" />
-     <Compile Include="Assets\Scripts\Destructors\OutOfScreenDespawner.cs" />
-     <Compile Include="Assets\Scripts\Destructors\TimedDespawner.cs" />
-     <Compile Include="Assets\Scripts\Destructors\TimedDisabler.cs" />
-     <Compile Include="Assets\Scripts\Entities\Enemies\Drone.cs" />
-     <Compile Include="Assets\Scripts\Entities\Enemies\EnemyBase.cs" />
-     <Compile Include="Assets\Scripts\Entities\Enemies\Fighter.cs" />
-     <Compile Include="Assets\Scripts\Entities\Enemies\Turret.cs" />
-     <Compile Include="Assets\Scripts\Entities\Pickups\Experience.cs" />
-     <Compile Include="Assets\Scripts\Entities\Pickups\PickupBase.cs" />
-     <Compile Include="Assets\Scripts\Entities\Pickups\Weapon.cs" />
-     <Compile Include="Assets\Scripts\Entities\PlayerEntity.cs" />
-     <Compile Include="Assets\Scripts\Helpers\DropMovement.cs" />
-     <Compile Include="Assets\Scripts\Helpers\LerpToPlace.cs" />
-     <Compile Include="Assets\Scripts\Helpers\MapHandler.cs" />
-     <Compile Include="Assets\Scripts\Helpers\ObjectRotator.cs" />
-     <Compile Include="Assets\Scripts\Helpers\Projectile.cs" />
-     <Compile Include="Assets\Scripts\Helpers\RandomMusic.cs" />
-     <Compile Include="Assets\Scripts\Helpers\RandomSound.cs" />
-     <Compile Include="Assets\Scripts\Helpers\SimpleLookAt.cs" />
-     <Compile Include="Assets\Scripts\ImageEffects\CameraMotionBlur.cs" />
-     <Compile Include="Assets\Scripts\ImageEffects\PostEffectsBase.cs" />
-     <Compile Include="Assets\Scripts\Menus\Calibration.cs" />
-     <Compile Include="Assets\Scripts\Menus\Customization\Attachment.cs" />
-     <Compile Include="Assets\Scripts\Menus\Customization\AttachmentPicker.cs" />
-     <Compile Include="Assets\Scripts\Menus\Customization\ColorPicker.cs" />
-     <Compile Include="Assets\Scripts\Menus\Customization\Customize.cs" />
-     <Compile Include="Assets\Scripts\Menus\Customization\Trash.cs" />
-     <Compile Include="Assets\Scripts\Menus\GameOverMenu.cs" />
-     <Compile Include="Assets\Scripts\Menus\MainMenu.cs" />
-     <Compile Include="Assets\Scripts\Menus\Profile.cs" />
-     <Compile Include="Assets\Scripts\Menus\SettingButton.cs" />
-     <Compile Include="Assets\Scripts\Menus\Settings.cs" />
-     <Compile Include="Assets\Scripts\Others\LeapMotion.cs" />
-     <Compile Include="Assets\Scripts\Others\LeapMouse.cs" />
-     <Compile Include="Assets\Scripts\Others\SBS.cs" />
-     <Compile Include="Assets\Scripts\Others\SBSMarker.cs" />
-     <Compile Include="Assets\Scripts\Others\Singleton.cs" />
-     <Compile Include="Assets\Scripts\Others\Utilities.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Laser.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Photon.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Scatter.cs" />
-     <Compile Include="Assets\Scripts\Weapons\WeaponBase.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\Displace.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\GerstnerDisplace.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\MeshContainer.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\PlanarReflection.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\SpecularLighting.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\Water.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\WaterBase.cs" />
+     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\WaterTile.cs" />
      <None Include="Assets\Other\Enter Sansman Font\!license.txt" />
      <None Include="Assets\Scripts\ImageEffects\CameraMotionBlurDX11.shader" />
      <None Include="Assets\Scripts\ImageEffects\CameraMotionBlur.shader" />
-     <None Include="Assets\Objects\Water\Shaders\FXWaterPro.shader" />
+     <None Include="Assets\Standard Assets\Environment\Water\Shaders\FXWaterPro.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>B:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -133,10 +90,6 @@
  <Reference Include="LeapCSharp.NET3.5">
  <HintPath>B:/Unity/Mayhem/Assets/SDK/LeapMotion/Core/Plugins/LeapCSharp.NET3.5.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{7F32AB24-E0E8-6554-66C8-AAB8DABB2F87}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
