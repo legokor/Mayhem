@@ -51,18 +51,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\Displace.cs" />
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\GerstnerDisplace.cs" />
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\MeshContainer.cs" />
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\PlanarReflection.cs" />
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\SpecularLighting.cs" />
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\Water.cs" />
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\WaterBase.cs" />
-     <Compile Include="Assets\Standard Assets\Environment\Water\Scripts\WaterTile.cs" />
+     <Compile Include="Assets\Standard Assets\Effects\DepthOfField\DepthOfField.cs" />
      <None Include="Assets\Other\Enter Sansman Font\!license.txt" />
+     <None Include="Assets\Scripts\ImageEffects\Resources\DepthOfField.shader" />
      <None Include="Assets\Scripts\ImageEffects\CameraMotionBlurDX11.shader" />
      <None Include="Assets\Scripts\ImageEffects\CameraMotionBlur.shader" />
-     <None Include="Assets\Standard Assets\Environment\Water\Shaders\FXWaterPro.shader" />
+     <None Include="Assets\Objects\Water\Shaders\FXWaterPro.shader" />
+     <None Include="Assets\Scripts\ImageEffects\Resources\MedianFilter.shader" />
+     <None Include="Assets\Scripts\ImageEffects\Resources\BokehSplatting.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>B:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

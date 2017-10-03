@@ -80,7 +80,11 @@
      <Compile Include="Assets\Scripts\Helpers\RandomSound.cs" />
      <Compile Include="Assets\Scripts\Helpers\SimpleLookAt.cs" />
      <Compile Include="Assets\Scripts\ImageEffects\CameraMotionBlur.cs" />
+     <Compile Include="Assets\Scripts\ImageEffects\DepthOfField.cs" />
+     <Compile Include="Assets\Scripts\ImageEffects\ImageEffectHelper.cs" />
+     <Compile Include="Assets\Scripts\ImageEffects\MinAttribute.cs" />
      <Compile Include="Assets\Scripts\ImageEffects\PostEffectsBase.cs" />
+     <Compile Include="Assets\Scripts\ImageEffects\RenderTextureUtility.cs" />
      <Compile Include="Assets\Scripts\Menus\Calibration.cs" />
      <Compile Include="Assets\Scripts\Menus\Customization\Attachment.cs" />
      <Compile Include="Assets\Scripts\Menus\Customization\AttachmentPicker.cs" />
@@ -103,9 +107,12 @@
      <Compile Include="Assets\Scripts\Weapons\Scatter.cs" />
      <Compile Include="Assets\Scripts\Weapons\WeaponBase.cs" />
      <None Include="Assets\Other\Enter Sansman Font\!license.txt" />
+     <None Include="Assets\Scripts\ImageEffects\DepthOfField.shader" />
      <None Include="Assets\Scripts\ImageEffects\CameraMotionBlurDX11.shader" />
      <None Include="Assets\Scripts\ImageEffects\CameraMotionBlur.shader" />
      <None Include="Assets\Objects\Water\Shaders\FXWaterPro.shader" />
+     <None Include="Assets\Scripts\ImageEffects\MedianFilter.shader" />
+     <None Include="Assets\Scripts\ImageEffects\BokehSplatting.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>B:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -133,10 +140,6 @@
  <Reference Include="LeapCSharp.NET3.5">
  <HintPath>B:/Unity/Mayhem/Assets/SDK/LeapMotion/Core/Plugins/LeapCSharp.NET3.5.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{7F32AB24-E0E8-6554-66C8-AAB8DABB2F87}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
