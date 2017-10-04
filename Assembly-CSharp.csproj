@@ -96,6 +96,7 @@
      <Compile Include="Assets\Scripts\Menus\Profile.cs" />
      <Compile Include="Assets\Scripts\Menus\SettingButton.cs" />
      <Compile Include="Assets\Scripts\Menus\Settings.cs" />
+     <Compile Include="Assets\Scripts\Menus\StatToText.cs" />
      <Compile Include="Assets\Scripts\Others\LeapMotion.cs" />
      <Compile Include="Assets\Scripts\Others\LeapMouse.cs" />
      <Compile Include="Assets\Scripts\Others\SBS.cs" />

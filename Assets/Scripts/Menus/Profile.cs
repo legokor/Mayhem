@@ -124,5 +124,21 @@ namespace Menus {
             get { return GetInt("TopScore", 0); }
             set { SetInt("TopScore", value); }
         }
+
+        /// <summary>
+        /// Unlocked levels' count.
+        /// </summary>
+        public static int Unlocks {
+            get { return GetInt("Unlocks", 1); }
+            set { SetInt("Unlocks", value); }
+        }
+
+        /// <summary>
+        /// Tokens available to buy parts.
+        /// </summary>
+        public static int Tokens {
+            get { return GetInt("Tokens", 3); }
+            set { SetInt("Tokens", value); }
+        }
     }
 }

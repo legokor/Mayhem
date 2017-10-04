@@ -1,26 +1,24 @@
-﻿using UnityEngine;
+﻿using System.Reflection;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Menus {
     /// <summary>
     /// A button which can change a setting.
     /// </summary>
-    [AddComponentMenu("Menus / SettingButton")]
-    [RequireComponent(typeof(Text)), RequireComponent(typeof(Button))]
+    [AddComponentMenu("Menus / Setting Button")]
+    [RequireComponent(typeof(Text), typeof(Button))]
     public class SettingButton : MonoBehaviour {
-        /// <summary>
-        /// The Setting's field in the Settings class.
-        /// </summary>
+        [Tooltip("The Setting's field in the Settings class.")]
         public string FieldName;
-        /// <summary>
-        /// The displayed name on the button.
-        /// </summary>
+        [Tooltip("The displayed name on the button.")]
         public string FullName;
 
+        PropertyInfo Property;
         Text Display;
 
         bool Get() {
-            return (bool)typeof(Settings).GetProperty(FieldName).GetValue(null, null);
+            return (bool)Property.GetValue(null, null);
         }
 
         void SetText(bool Value) {
@@ -28,6 +26,7 @@ namespace Menus {
         }
 
         void Start() {
+            Property = typeof(Settings).GetProperty(FieldName);
             Display = GetComponent<Text>();
             SetText(Get());
             GetComponent<Button>().onClick.AddListener(Flip);
@@ -35,7 +34,7 @@ namespace Menus {
 
         public void Flip() {
             bool NewValue = !Get();
-            typeof(Settings).GetProperty(FieldName).SetValue(null, NewValue, null);
+            Property.SetValue(null, NewValue, null);
             SetText(NewValue);
             MainMenu.PlaySoundOn(gameObject);
         }
