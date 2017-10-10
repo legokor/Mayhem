@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
+using UnityStandardAssets.CinematicEffects;
+using UnityStandardAssets.ImageEffects;
 
 /// <summary>
 /// Generic Side-by-Side 3D.
@@ -50,25 +54,53 @@ public class SBS : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Copies a component to another object.
+    /// </summary>
+    static Component CopyComponent(Component Source, GameObject Target) {
+        Type ComponentType = Source.GetType();
+        Component Copy = Target.AddComponent(ComponentType);
+        FieldInfo[] Fields = ComponentType.GetFields();
+        int FieldCount = Fields.Length;
+        for (int Field = 0; Field < FieldCount; ++Field) {
+            FieldInfo Reference = Fields[Field];
+            Reference.SetValue(Copy, Reference.GetValue(Source));
+        }
+        PropertyInfo[] Properties = ComponentType.GetProperties();
+        int PropertyCount = Properties.Length;
+        for (int Property = 0; Property < PropertyCount; ++Property) {
+            PropertyInfo Reference = Properties[Property];
+            if (Reference.SetMethod != null && !Reference.Name.Contains("Matrix"))
+                Reference.SetValue(Copy, Reference.GetValue(Source));
+        }
+        return Copy;
+    }
+
+    /// <summary>
+    /// Creates a copy of a target camera parented under that camera.
+    /// </summary>
     static void CreateCopy(Camera TargetCam) {
         GameObject NewObj = new GameObject();
-        Camera OtherEye = NewObj.AddComponent<Camera>();
-        OtherEye.gameObject.transform.parent = TargetCam.gameObject.transform;
-        OtherEye.transform.localPosition = new Vector3(-EyeDistance, 0, 0);
-        OtherEye.transform.localEulerAngles = new Vector3(0, EyeRotation, 0);
-        OtherEye.clearFlags = TargetCam.clearFlags;
-        OtherEye.backgroundColor = TargetCam.backgroundColor;
-        OtherEye.cullingMask = TargetCam.cullingMask;
-        OtherEye.rect = new Rect(0, 0, .5f, 1);
+        NewObj.transform.parent = TargetCam.gameObject.transform;
+        NewObj.transform.localPosition = new Vector3(-EyeDistance, 0, 0);
+        NewObj.transform.localEulerAngles = new Vector3(0, EyeRotation, 0);
         float FovExtension = Screen.width / (float)Screen.height;
-        OtherEye.fieldOfView = TargetCam.fieldOfView *= FovExtension;
-        OtherEye.orthographic = TargetCam.orthographic;
-        OtherEye.orthographicSize = TargetCam.orthographicSize *= FovExtension;
+        TargetCam.fieldOfView *= FovExtension;
+        TargetCam.orthographicSize *= FovExtension;
         TargetCam.rect = new Rect(.5f, 0, .5f, 1);
-        OtherEye.depth = TargetCam.depth;
+        Camera OtherEye = (Camera)CopyComponent(TargetCam, NewObj);
+        OtherEye.rect = new Rect(0, 0, .5f, 1);
+        // Copy skybox and effects
         Skybox Sky = TargetCam.gameObject.GetComponent<Skybox>();
         if (Sky)
-            NewObj.AddComponent<Skybox>().material = Sky.material;
+            CopyComponent(Sky, NewObj);
+        DepthOfField DoF = TargetCam.gameObject.GetComponent<DepthOfField>();
+        if (DoF)
+            CopyComponent(DoF, NewObj);
+        CameraMotionBlur Blur = TargetCam.gameObject.GetComponent<CameraMotionBlur>();
+        if (Blur)
+            CopyComponent(Blur, NewObj);
+        // Group
         OtherEyes.Add(OtherEye);
         if (TargetCam == Camera.main)
             OtherMain = OtherEye;
