@@ -135,8 +135,8 @@
  <Reference Include="UnityEngine.HoloLens">
  <HintPath>B:/Unity/Editor/Data/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
  </Reference>
- <Reference Include="CavernUnity.Editor">
- <HintPath>B:/Unity/Mayhem/Assets/SDK/CavernUnity.Editor.dll</HintPath>
+ <Reference Include="CavernUnity">
+ <HintPath>B:/Unity/Mayhem/Assets/SDK/CavernUnity.dll</HintPath>
  </Reference>
  <Reference Include="LeapCSharp.NET3.5">
  <HintPath>B:/Unity/Mayhem/Assets/SDK/LeapMotion/Core/Plugins/LeapCSharp.NET3.5.dll</HintPath>
