@@ -72,6 +72,7 @@
      <Compile Include="Assets\Scripts\Entities\Pickups\Weapon.cs" />
      <Compile Include="Assets\Scripts\Entities\PlayerEntity.cs" />
      <Compile Include="Assets\Scripts\Helpers\DropMovement.cs" />
+     <Compile Include="Assets\Scripts\Helpers\KeyHandler.cs" />
      <Compile Include="Assets\Scripts\Helpers\LerpToPlace.cs" />
      <Compile Include="Assets\Scripts\Helpers\MapHandler.cs" />
      <Compile Include="Assets\Scripts\Helpers\ObjectRotator.cs" />
@@ -93,6 +94,7 @@
      <Compile Include="Assets\Scripts\Menus\Customization\Trash.cs" />
      <Compile Include="Assets\Scripts\Menus\GameOverMenu.cs" />
      <Compile Include="Assets\Scripts\Menus\MainMenu.cs" />
+     <Compile Include="Assets\Scripts\Menus\PauseMenu.cs" />
      <Compile Include="Assets\Scripts\Menus\Profile.cs" />
      <Compile Include="Assets\Scripts\Menus\SettingButton.cs" />
      <Compile Include="Assets\Scripts\Menus\Settings.cs" />
