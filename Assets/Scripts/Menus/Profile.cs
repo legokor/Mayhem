@@ -6,10 +6,25 @@ namespace Menus {
     /// Profile data holder.
     /// </summary>
     public static class Profile {
+        public delegate void ProfileChange();
+
+        public static event ProfileChange OnProfileChanged;
+
         /// <summary>
         /// Current player username.
         /// </summary>
-        public static string Username = "Default";
+        static string _Username = "Default";
+
+        /// <summary>
+        /// Get or set the profile by name.
+        /// </summary>
+        public static string Username {
+            get { return _Username; }
+            set {
+                _Username = value;
+                OnProfileChanged?.Invoke();
+            }
+        }
 
         /// <summary>
         /// Sets the value of the preference identified by key.

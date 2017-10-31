@@ -19,10 +19,15 @@ namespace Menus {
             Display.text = ((int)Property.GetValue(null, null)).ToString();
         }
 
-        void Start() {
+        void OnEnable() {
             Property = typeof(Profile).GetProperty(FieldName);
             Display = GetComponent<Text>();
             Reload();
+            Profile.OnProfileChanged += Reload;
+        }
+
+        void OnDisable() {
+            Profile.OnProfileChanged -= Reload;
         }
     }
 }

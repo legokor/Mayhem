@@ -14,6 +14,7 @@ namespace Menus {
         [Tooltip("The displayed name on the button.")]
         public string FullName;
 
+        bool LastValue;
         PropertyInfo Property;
         Text Display;
 
@@ -25,18 +26,28 @@ namespace Menus {
             Display.text = FullName + (Value ? " (on)" : " (off)");
         }
 
-        void Start() {
+        void Reload() {
+            if (Get() != LastValue)
+                Flip();
+        }
+
+        void OnEnable() {
             Property = typeof(Settings).GetProperty(FieldName);
             Display = GetComponent<Text>();
-            SetText(Get());
+            SetText(LastValue = Get());
             GetComponent<Button>().onClick.AddListener(Flip);
+            Profile.OnProfileChanged += Reload;
         }
 
         public void Flip() {
-            bool NewValue = !Get();
+            bool NewValue = LastValue = !Get();
             Property.SetValue(null, NewValue, null);
             SetText(NewValue);
             MainMenu.PlaySoundOn(gameObject);
+        }
+
+        void OnDisable() {
+            Profile.OnProfileChanged -= Reload;
         }
     }
 }
