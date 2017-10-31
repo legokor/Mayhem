@@ -7,9 +7,6 @@ namespace Menus {
     /// </summary>
     [AddComponentMenu("Menus / Profile Switcher")]
     public class ProfileSwitcher : MonoBehaviour {
-        /// <summary>
-        /// Sample button.
-        /// </summary>
         [Tooltip("Sample button.")]
         public Button Sample;
 
