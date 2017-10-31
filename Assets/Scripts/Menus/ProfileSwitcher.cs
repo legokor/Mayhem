@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Menus {
@@ -11,9 +12,24 @@ namespace Menus {
         public Button Sample;
 
         /// <summary>
+        /// Vertical distance beetween buttons.
+        /// </summary>
+        float ButtonDistance;
+
+        /// <summary>
         /// List of available player profiles.
         /// </summary>
         string[] Profiles = { "Default" };
+
+        Button CreateProfileButton(int Profile) {
+            GameObject NewButton = Instantiate(Sample.gameObject, Sample.transform.parent);
+            NewButton.transform.localPosition = new Vector3(NewButton.transform.localPosition.x, -Profile * ButtonDistance);
+            NewButton.GetComponent<Text>().text = Profiles[Profile];
+            int CurrentProfile = Profile;
+            Button ButtonComponent = NewButton.GetComponent<Button>();
+            ButtonComponent.onClick.AddListener(delegate { LoadProfile(Profiles[CurrentProfile]); });
+            return ButtonComponent;
+        }
 
         /// <summary>
         /// Load profile list when the profile switcher is created.
@@ -27,22 +43,35 @@ namespace Menus {
             for (int Profile = 0; Profile < ProfileCount; ++Profile)
                 Profiles[Profile] = PlayerPrefs.GetString("Profile" + Profile);
             // Create buttons
-            float ButtonDistance = Sample.GetComponent<RectTransform>().sizeDelta.y;
-            for (int Profile = 0; Profile < ProfileCount; ++Profile) {
-                GameObject NewButton = Instantiate(Sample.gameObject, Sample.transform.parent);
-                NewButton.transform.position += new Vector3(0, Profile * ButtonDistance);
-                NewButton.GetComponent<Text>().text = Profiles[Profile];
-                int CurrentProfile = Profile;
-                NewButton.GetComponent<Button>().onClick.AddListener(delegate { LoadProfile(Profiles[CurrentProfile]); });
-            }
+            ButtonDistance = Sample.GetComponent<RectTransform>().sizeDelta.y;
+            Button LastButton = null;
+            for (int Profile = 0; Profile < ProfileCount; ++Profile)
+                LastButton = CreateProfileButton(Profile);
             Destroy(Sample.gameObject);
+            Sample = LastButton;
         }
 
         /// <summary>
         /// Loads a profile by name. Delegates will do the rest.
         /// </summary>
-        void LoadProfile(string Name) {
+        public void LoadProfile(string Name) {
             Profile.Username = Name;
+        }
+
+        /// <summary>
+        /// Create and load a new profile.
+        /// </summary>
+        public void CreateProfile(InputField Name) {
+            if (Name.text.Equals(string.Empty))
+                return;
+            int ProfileCount = Profiles.Length;
+            for (int Profile = 0; Profile < ProfileCount; ++Profile)
+                if (Profiles[Profile].Equals(Name.text))
+                    return;
+            Array.Resize(ref Profiles, ProfileCount + 1);
+            LoadProfile(Profiles[ProfileCount] = Name.text);
+            CreateProfileButton(ProfileCount);
+            Save();
         }
 
         /// <summary>
@@ -53,6 +82,7 @@ namespace Menus {
             PlayerPrefs.SetInt("ProfileCount", ProfileCount);
             for (int Profile = 0; Profile < ProfileCount; ++Profile)
                 PlayerPrefs.SetString("Profile" + Profile, Profiles[Profile]);
+            PlayerPrefs.Save();
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System.Text;
 
 namespace Menus {
     [AddComponentMenu("Menus / Game Over")]

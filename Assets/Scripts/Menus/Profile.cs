@@ -11,15 +11,6 @@ namespace Menus {
         public static event ProfileChange OnProfileChanged;
 
         /// <summary>
-        /// True if the profile was loaded.
-        /// </summary>
-        static bool UserLoaded = false;
-        /// <summary>
-        /// Current player username.
-        /// </summary>
-        static string _Username = "Default";
-
-        /// <summary>
         /// Get or set the profile by name.
         /// </summary>
         public static string Username {
@@ -36,6 +27,8 @@ namespace Menus {
                 OnProfileChanged?.Invoke();
             }
         }
+        static bool UserLoaded = false;
+        static string _Username = "Default";
 
         /// <summary>
         /// Sets the value of the preference identified by key.
