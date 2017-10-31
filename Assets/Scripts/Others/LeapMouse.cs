@@ -16,9 +16,9 @@ public class LeapMouse : Singleton<LeapMouse> {
     /// </summary>
     bool Tapped = false;
     /// <summary>
-    /// The button the cursor was over last frame.
+    /// The UI element the cursor was over last frame.
     /// </summary>
-    Button LastHovered;
+    Selectable LastHovered;
     /// <summary>
     /// Dummy data required for some UI calls.
     /// </summary>
@@ -87,14 +87,18 @@ public class LeapMouse : Singleton<LeapMouse> {
         Tapped = FingerCount == 0 && LastFingerCount != 0;
             RaycastHit hit;
         if (Physics.Raycast(SBS.StereoRay(new Vector2(HandPosition.x, Screen.height - HandPosition.y)), out hit)) {
-            Button Hovered = hit.collider.gameObject.GetComponentInChildren<Button>();
+            Selectable Hovered = hit.collider.gameObject.GetComponentInChildren<Selectable>();
             if (Hovered) {
                 if (LastHovered && Hovered != LastHovered)
                     LastHovered.OnPointerExit(RandomPointerEventData);
                 Hovered.OnPointerEnter(RandomPointerEventData);
                 LastHovered = Hovered;
-                if (ActionDown())
-                    Hovered.OnPointerClick(RandomPointerEventData);
+                if (ActionDown()) {
+                    if (Hovered.GetType() == typeof(Button))
+                        ((Button)Hovered).OnPointerClick(RandomPointerEventData);
+                    else
+                        Hovered.Select();
+                }
             } else if (LastHovered)
                 LastHovered.OnPointerExit(RandomPointerEventData);
         } else if (LastHovered)
