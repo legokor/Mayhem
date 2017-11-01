@@ -21,9 +21,18 @@ namespace Menus {
         /// </summary>
         string[] Profiles = { "Default" };
 
+        /// <summary>
+        /// Create a loader button for a profile by cloning the <see cref="Sample"/>.
+        /// </summary>
+        /// <param name="Profile">Profile ID in the <see cref="Profiles"/> array</param>
+        /// <returns>Loader button for the chosen profile</returns>
         Button CreateProfileButton(int Profile) {
-            GameObject NewButton = Instantiate(Sample.gameObject, Sample.transform.parent);
-            NewButton.transform.localPosition = new Vector3(NewButton.transform.localPosition.x, -Profile * ButtonDistance);
+            Transform ContentHolder = Sample.transform.parent;
+            GameObject NewButton = Instantiate(Sample.gameObject, ContentHolder);
+            RectTransform ContentRect = ContentHolder.GetComponent<RectTransform>();
+            float ViewportHeight = Profile * ButtonDistance;
+            ContentRect.sizeDelta = new Vector2(ContentRect.sizeDelta.x, ViewportHeight + ButtonDistance);
+            NewButton.transform.localPosition = new Vector3(NewButton.transform.localPosition.x, -ViewportHeight);
             NewButton.GetComponent<Text>().text = Profiles[Profile];
             int CurrentProfile = Profile;
             Button ButtonComponent = NewButton.GetComponent<Button>();
@@ -31,6 +40,9 @@ namespace Menus {
             return ButtonComponent;
         }
 
+        /// <summary>
+        /// Create loader buttons for all stored profiles.
+        /// </summary>
         void CreateProfileButtons() {
             ButtonDistance = Sample.GetComponent<RectTransform>().sizeDelta.y;
             Button LastButton = null;
