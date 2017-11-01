@@ -56,6 +56,14 @@ namespace Menus {
             NewObj.AddComponent<TimedDespawner>().Timer = 1;
         }
 
+        /// <summary>
+        /// Non-static version of <see cref="PlaySoundOn(GameObject)"/> for Unity Action use.
+        /// </summary>
+        /// <param name="Obj">Target</param>
+        public void PlaySoundOnObj(GameObject Obj) {
+            PlaySoundOn(Obj);
+        }
+
         void ApplyCalibration(Vector3 Minimums, Vector3 Maximums) {
             Settings.LeapLowerBounds = Minimums;
             Settings.LeapUpperBounds = Maximums;
