@@ -31,24 +31,27 @@ namespace Menus {
             return ButtonComponent;
         }
 
+        void CreateProfileButtons() {
+            ButtonDistance = Sample.GetComponent<RectTransform>().sizeDelta.y;
+            Button LastButton = null;
+            int ProfileCount = Profiles.Length;
+            for (int Profile = 0; Profile < ProfileCount; ++Profile)
+                LastButton = CreateProfileButton(Profile);
+            Destroy(Sample.gameObject);
+            Sample = LastButton;
+        }
+
         /// <summary>
         /// Load profile list when the profile switcher is created.
         /// </summary>
         void Awake() {
-            // Load list
             if (!PlayerPrefs.HasKey("ProfileCount"))
                 Save();
             int ProfileCount = PlayerPrefs.GetInt("ProfileCount");
             Profiles = new string[ProfileCount];
             for (int Profile = 0; Profile < ProfileCount; ++Profile)
                 Profiles[Profile] = PlayerPrefs.GetString("Profile" + Profile);
-            // Create buttons
-            ButtonDistance = Sample.GetComponent<RectTransform>().sizeDelta.y;
-            Button LastButton = null;
-            for (int Profile = 0; Profile < ProfileCount; ++Profile)
-                LastButton = CreateProfileButton(Profile);
-            Destroy(Sample.gameObject);
-            Sample = LastButton;
+            CreateProfileButtons();
         }
 
         /// <summary>
@@ -72,6 +75,33 @@ namespace Menus {
             LoadProfile(Profiles[ProfileCount] = Name.text);
             CreateProfileButton(ProfileCount);
             Save();
+        }
+
+        public void DeleteProfile(Text Name) {
+            int ProfileCount = Profiles.Length;
+            if (ProfileCount == 1)
+                return;
+            // Destroy all buttons except one
+            Transform Holder = Sample.transform.parent;
+            Sample = Holder.GetChild(0).gameObject.GetComponent<Button>();
+            int Children = Holder.childCount;
+            for (int Child = Children - 1; Child >= 1; --Child)
+                Destroy(Holder.GetChild(Child).gameObject);
+            // Delete profile entry
+            for (int ProfileID = 0; ProfileID < ProfileCount; ++ProfileID) {
+                if (Profiles[ProfileID].Equals(Name.text)) {
+                    Profile.DeleteProfile(Name.text);
+                    if (Profiles[ProfileID].Equals(Profile.Username))
+                        LoadProfile(Profiles[ProfileID != 0 ? 0 : 1]); // Change profile to first available if the current is being deleted
+                    --ProfileCount;
+                    while (ProfileID < ProfileCount)
+                        Profiles[ProfileID] = Profiles[++ProfileID];
+                    Array.Resize(ref Profiles, ProfileCount);
+                    CreateProfileButtons(); // Recreate UI
+                    Save();
+                    return;
+                }
+            }
         }
 
         /// <summary>
