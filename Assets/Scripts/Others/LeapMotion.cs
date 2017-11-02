@@ -17,6 +17,11 @@ public class LeapMotion : Singleton<LeapMotion> {
     Controller Device;
 
     /// <summary>
+    /// A position indicating unavailable Leap Motion data (e.g. no hands are detected).
+    /// </summary>
+    public static readonly Vector2 NotAvailable = new Vector2(-1, -1);
+
+    /// <summary>
     /// Connect to the device automatically on creation.
     /// </summary>
     void Awake() {
@@ -50,6 +55,17 @@ public class LeapMotion : Singleton<LeapMotion> {
         return new Vector2(
             (Mathf.Clamp(FromLeap.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
             (Mathf.Clamp(FromLeap.y, LeapLowerBounds.y, LeapUpperBounds.y) - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y) * Screen.height);
+    }
+
+    /// <summary>
+    /// Calculates where the given world position should be shown on screen.
+    /// </summary>
+    /// <param name="FromLeap">Hand position from the device</param>
+    /// <returns>Viewport position</returns>
+    Vector2 ViewportFromLeap(Vector2 FromLeap) {
+        return new Vector2(
+            (Mathf.Clamp(FromLeap.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x),
+            (Mathf.Clamp(FromLeap.y, LeapLowerBounds.y, LeapUpperBounds.y) - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y));
     }
 
     /// <summary>
@@ -91,7 +107,21 @@ public class LeapMotion : Singleton<LeapMotion> {
             Hand CheckedHand = Device.Frame().Hands[HandID];
             return ScreenFromLeap(new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y));
         } else {
-            return new Vector2(-1, -1);
+            return NotAvailable;
+        }
+    }
+
+    /// <summary>
+    /// Palm position on viewport, on a vertical plane.
+    /// </summary>
+    /// <param name="HandID">Hand ID</param>
+    /// <returns>Palm position on viewport, or (-1, -1) if there's no hand</returns>
+    public Vector2 PalmOnViewportXY(int HandID = 0) {
+        if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
+            Hand CheckedHand = Device.Frame().Hands[HandID];
+            return ViewportFromLeap(new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y));
+        } else {
+            return NotAvailable;
         }
     }
 
@@ -105,7 +135,21 @@ public class LeapMotion : Singleton<LeapMotion> {
             Hand CheckedHand = Device.Frame().Hands[HandID];
             return ScreenFromLeap(new Vector2(CheckedHand.PalmPosition.x, CheckedHand.PalmPosition.z));
         } else {
-            return new Vector2(-1, -1);
+            return NotAvailable;
+        }
+    }
+
+    /// <summary>
+    /// Palm position on viewport, on a horizontal plane.
+    /// </summary>
+    /// <param name="HandID">Hand ID</param>
+    /// <returns>Palm position on viewport, or (-1, -1) if there's no hand</returns>
+    public Vector2 PalmOnViewportXZ(int HandID = 0) {
+        if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
+            Hand CheckedHand = Device.Frame().Hands[HandID];
+            return ViewportFromLeap(new Vector2(CheckedHand.PalmPosition.x, CheckedHand.PalmPosition.z));
+        } else {
+            return NotAvailable;
         }
     }
 
@@ -123,8 +167,18 @@ public class LeapMotion : Singleton<LeapMotion> {
                     Furthest = CheckedFinger;
             return ScreenFromLeap(new Vector2(Furthest.StabilizedTipPosition.x, Furthest.StabilizedTipPosition.y));
         } else {
-            return new Vector2(-1, -1);
+            return NotAvailable;
         }
+    }
+
+    public Vector2 ScreenDelta(Vector2 CurrentPosition, ref Vector2 LastPositionHolder) {
+        if (CurrentPosition == NotAvailable || LastPositionHolder == NotAvailable) {
+            LastPositionHolder = CurrentPosition;
+            return NotAvailable;
+        }
+        Vector2 Delta = CurrentPosition - LastPositionHolder;
+        LastPositionHolder = CurrentPosition;
+        return Delta;
     }
 
     /// <summary>

@@ -17,8 +17,6 @@ public class PlayerEntity : Singleton<PlayerEntity> {
     public AudioClip AudioPhoton, AudioScatter, AudioBeam;
     public GameObject ProjectileEntity, BeamEntity, PlayerBody, DeathEffect;
     [Header("Settings")]
-    [Tooltip("Don't drag the player entity as fast as the user moves their hand.")]
-    public bool LeapSpeedLimit = false;
     [Tooltip("Fire automatically.")]
     public bool AutoFire = true;
     [Header("References")]
@@ -30,13 +28,15 @@ public class PlayerEntity : Singleton<PlayerEntity> {
     WeaponBase Weapon;
 
     float Health = 100,
-    MovePos = -35,
-    SidePos = 0,
-    SinceSpawn = 3;
+        MovePos = -35,
+        SidePos = 0,
+        SinceSpawn = 3;
 
     int Lives = 3, Score = -50;
 
     Texture2D GUIColor, GUITransparency;
+
+    const float AreaWidth = 160, AreaHeight = 110, AreaWMax = AreaWidth * .5f, AreaWMin = -AreaWMax, AreaHMax = AreaHeight * .5f, AreaHMin = -AreaHMax;
 
     public void AwardScore(int Score) {
         this.Score += Score;
@@ -142,36 +142,28 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         }
         Weapon.Firing = AutoFire; // Firing to default
         Health = Mathf.Min(Health + Time.deltaTime * 3f, 100); // Refill health
-                                                               // Flashing after death
+        // Flashing after death
         SinceSpawn += Time.deltaTime;
         bool ShowBody = SinceSpawn < 3 ? Mathf.FloorToInt(SinceSpawn * 4) % 2 == 0 : true;
         if (ShowBody != PlayerBody.activeSelf)
             PlayerBody.SetActive(ShowBody);
         // Movement
-        Vector2 LeapTarget = LeapMotion.Instance.PalmOnScreenXZ();
-        float VerticalMovement = 0, HorizontalMovement = 0;
-        if (LeapTarget.x != -1 && LeapTarget.y != -1) {
-            Vector3 CurrentPosition = Camera.main.WorldToScreenPoint(transform.position);
-            Vector3 LeapDirection = new Vector3(LeapTarget.x - CurrentPosition.x, (Screen.height - LeapTarget.y) - CurrentPosition.y);
-            if (LeapSpeedLimit) {
-                if (Math.Abs(LeapDirection.y) > Screen.width / 100f)
-                    VerticalMovement = Math.Sign(LeapDirection.y);
-                if (Math.Abs(LeapDirection.x) > Screen.height / 100f)
-                    HorizontalMovement = Math.Sign(LeapDirection.x);
-            } else {
-                VerticalMovement = LeapDirection.y / 20f;
-                HorizontalMovement = LeapDirection.x / 20f;
-            }
+        Vector2 LeapPosition = LeapMotion.Instance.PalmOnViewportXZ();
+        float HorizontalMovement;
+        if (LeapPosition != LeapMotion.NotAvailable) {
+            MovePos = (.5f - LeapPosition.y) * AreaHeight;
+            float OldSidePos = SidePos;
+            SidePos = (LeapPosition.x - .5f) * AreaWidth;
+            HorizontalMovement = Mathf.Clamp(SidePos - OldSidePos, -1, 1);
             Weapon.Firing = true;
         } else {
-            VerticalMovement = Convert.ToSingle(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)) -
-                Convert.ToSingle(Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S));
-            HorizontalMovement = ((Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) ? 1 : 0) -
-                ((Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) ? 1 : 0);
+            MovePos = Mathf.Clamp(MovePos + ((Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W) ? 1 : 0) -
+                (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S) ? 1 : 0)) * Time.deltaTime * 100f, AreaHMin, AreaHMax);
+            HorizontalMovement = ((Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D) ? 1 : 0) -
+                (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A) ? 1 : 0));
+            SidePos = Mathf.Clamp(SidePos + HorizontalMovement * Time.deltaTime * 100f, AreaWMin, AreaWMax);
             Weapon.Firing |= Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0);
         }
-        MovePos = Mathf.Clamp(MovePos + VerticalMovement * Time.deltaTime * 100f, -55, 55);
-        SidePos = Mathf.Clamp(SidePos + HorizontalMovement * Time.deltaTime * 100f, -80, 80);
         transform.position = new Vector3(SidePos, 25, MovePos + MapHandler.Instance.MapPos);
         transform.rotation = Quaternion.Euler(0, 0, -HorizontalMovement * 15f);
     }
