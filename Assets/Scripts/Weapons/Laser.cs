@@ -26,7 +26,7 @@ namespace Weapons {
             if (ActualCooldown <= 0) {
                 ActualCooldown += .0625f; // The beam actually hits 16 times a second
                 projectile.Damage = (int)((Level + 2) * 2.5f); // DPS: level * 40 + 80
-                PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioBeam, .5f);
+                PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioBeam);
             } else
                 projectile.Damage = 0;
             projectile.WeaponKind = WeaponKinds.Laser;

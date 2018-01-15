@@ -47,8 +47,8 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         Score += 25;
     }
 
-    public void PlaySound(AudioClip Sound, float Volume = 1, bool Static = false) {
-        Source.PlayOneShot(Sound, Volume, Static);
+    public void PlaySound(AudioClip Sound, float Volume = -1, bool Static = false) {
+        Source.PlayOneShot(Sound, Volume == -1 ? Source.Volume : Volume, Static);
     }
 
     public void WeaponPickup(WeaponKinds Kind) {

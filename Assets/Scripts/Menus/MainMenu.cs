@@ -51,7 +51,7 @@ namespace Menus {
             NewObj.transform.position = Obj.transform.position;
             AudioSource3D Source = NewObj.AddComponent<AudioSource3D>();
             Source.clip = _SelectSound;
-            Source.Volume = .33f;
+            Source.Volume = .1f;
             Source.Play();
             NewObj.AddComponent<TimedDespawner>().Timer = 1;
         }

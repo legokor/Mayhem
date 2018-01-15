@@ -25,7 +25,7 @@ namespace Weapons {
                 projectile.WeaponKind = WeaponKinds.Scatter;
                 projectile.Repaint(new Color(1, .5f, 0));
             }
-            PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioScatter, .5f);
+            PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioScatter);
         }
     }
 }

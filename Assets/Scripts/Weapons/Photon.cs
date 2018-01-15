@@ -26,7 +26,7 @@ namespace Weapons {
                 ParticleSystem.MainModule ParticleMain = projectile.GetComponent<ParticleSystem>().main;
                 ParticleMain.startSizeXMultiplier *= 2;
             }
-            PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioPhoton, .5f);
+            PlayerEntity.Instance.PlaySound(PlayerEntity.Instance.AudioPhoton);
         }
     }
 }
