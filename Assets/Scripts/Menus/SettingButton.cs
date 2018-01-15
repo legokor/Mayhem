@@ -40,7 +40,7 @@ namespace Menus {
         }
 
         public void Flip() {
-            bool NewValue = LastValue = !Get();
+            bool NewValue = LastValue = !LastValue;
             Property.SetValue(null, NewValue, null);
             SetText(NewValue);
             MainMenu.PlaySoundOn(gameObject);

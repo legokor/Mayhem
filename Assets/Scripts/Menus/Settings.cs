@@ -7,6 +7,14 @@ namespace Menus {
     /// </summary>
     public static class Settings {
         /// <summary>
+        /// Force reloading of setting values.
+        /// </summary>
+        public static void Unload() {
+            _Music = _HQAudio = _MotionBlur = _FollowerCamera = null;
+            LeapSetupXY();
+        }
+
+        /// <summary>
         /// Enable background music.
         /// </summary>
         public static bool Music {

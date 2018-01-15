@@ -25,6 +25,7 @@ namespace Menus {
             set {
                 PlayerPrefs.SetString("Profile", _Username = value);
                 PlayerPrefs.Save();
+                Settings.Unload();
                 OnProfileChanged?.Invoke();
             }
         }
