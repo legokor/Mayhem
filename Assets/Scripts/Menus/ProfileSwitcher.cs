@@ -32,7 +32,8 @@ namespace Menus {
             RectTransform ContentRect = ContentHolder.GetComponent<RectTransform>();
             float ViewportHeight = Profile * ButtonDistance;
             ContentRect.sizeDelta = new Vector2(ContentRect.sizeDelta.x, ViewportHeight + ButtonDistance);
-            NewButton.transform.localPosition = new Vector3(NewButton.transform.localPosition.x, -ViewportHeight);
+            // Temporarily moved, see the Update function!
+            //NewButton.transform.localPosition = new Vector3(NewButton.transform.localPosition.x, -ViewportHeight);
             NewButton.GetComponent<Text>().text = Profiles[Profile];
             int CurrentProfile = Profile;
             Button ButtonComponent = NewButton.GetComponent<Button>();
@@ -51,6 +52,16 @@ namespace Menus {
                 LastButton = CreateProfileButton(Profile);
             Destroy(Sample.gameObject);
             Sample = LastButton;
+        }
+
+        /// <summary>
+        /// Temporary fix for Unity 2017.3.0, as repositioning after instantiating is bugged.
+        /// </summary>
+        void Update() {
+            Transform ButtonHolder = Sample.transform.parent;
+            float InitialX = Sample.transform.localPosition.x;
+            for (int ProfileID = 0; ProfileID < ButtonHolder.childCount; ++ProfileID)
+                ButtonHolder.GetChild(ProfileID).localPosition = new Vector3(InitialX, -ProfileID * ButtonDistance);
         }
 
         /// <summary>
