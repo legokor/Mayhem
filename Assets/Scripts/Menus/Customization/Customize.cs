@@ -37,10 +37,19 @@ namespace Menus.Customization {
         /// Last screen position pointed to.
         /// </summary>
         Vector2 LastPointerPos;
+        /// <summary>
+        /// Hand distance in the last frame.
+        /// </summary>
+        Vector2 LastScale;
+        /// <summary>
+        /// The body's position at spawn.
+        /// </summary>
+        Vector3 StartPosition;
 
         void Start() {
             AttachmentCopies = (GameObject[])Attachments.Clone();
             ColorCopies = (Material[])Colors.Clone();
+            StartPosition = Body.transform.position;
             StartRotation = Body.transform.rotation;
             SelectedColor = Profile.GetInt("ShipColor", 0);
         }
@@ -163,21 +172,29 @@ namespace Menus.Customization {
         /// Loads the saved player ship in the menu.
         /// </summary>
         public void Deserialize() {
-            Body.transform.rotation = StartRotation; // Reset rotation.
+            Body.transform.position = StartPosition;
+            Body.transform.rotation = StartRotation;
             Cleanup();
             DeserializeTo(Body);
         }
 
         void Update() {
-            Vector2 PointerPos = LeapMouse.Instance.ScreenPosition();
+            Vector2 PointerPos = LeapMouse.Instance.ScreenPosition(), HandsDist = PointerPos - LeapMotion.Instance.PalmOnScreenXYUnclamped(1);
             if (LeapMouse.Instance.Action()) {
-                Vector2 Difference = (LastPointerPos - PointerPos) * Sensitivity;
-                Body.transform.rotation = Quaternion.Euler(Camera.main.transform.up * Difference.x) *
-                                          Quaternion.Euler(Camera.main.transform.right * Difference.y) * Body.transform.rotation;
-                Vector3 EulerAngles = Body.transform.localEulerAngles;
-                Body.transform.localEulerAngles = new Vector3(EulerAngles.x, EulerAngles.y, 0);
+                if (LeapMotion.Instance.GetHandCount() > 1 && LeapMotion.Instance.ExtendedFingers(1) == 0) {
+                    float Difference = (HandsDist.magnitude - LastScale.magnitude) * Sensitivity;
+                    Vector3 Direction = (Camera.main.transform.position - Body.transform.position).normalized;
+                    Body.transform.position += Direction * (Difference * 3 / Screen.width);
+                } else { // Rotate
+                    Vector2 Difference = (LastPointerPos - PointerPos) * Sensitivity;
+                    Body.transform.rotation = Quaternion.Euler(Camera.main.transform.up * Difference.x) *
+                                              Quaternion.Euler(Camera.main.transform.right * Difference.y) * Body.transform.rotation;
+                    Vector3 EulerAngles = Body.transform.localEulerAngles;
+                    Body.transform.localEulerAngles = new Vector3(EulerAngles.x, EulerAngles.y, 0);
+                }
             }
             LastPointerPos = PointerPos;
+            LastScale = HandsDist;
         }
     }
 }
