@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class LeapMouse : Singleton<LeapMouse> {
     [Tooltip("Cursor texture.")]
     public Texture MouseIcon;
+    [Tooltip("On-screen off-hand marker.")]
+    public Texture OffHandIcon;
     [Tooltip("Size of the cursor.")]
     public Vector2 MouseSize = new Vector2(64, 64);
     [Tooltip("The center of the cursor is the selection.")]
@@ -61,7 +63,14 @@ public class LeapMouse : Singleton<LeapMouse> {
         return LeapMotion.Instance.IsUsed() ? LeapMotion.Instance.PalmOnScreenXY() : new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
     }
 
-	void Start() {
+    /// <summary>
+    /// Gets the pointer (mouse or main hand) position on or off screen.
+    /// </summary>
+    public Vector2 ScreenPositionUnclamped() {
+        return LeapMotion.Instance.IsUsed() ? LeapMotion.Instance.PalmOnScreenXYUnclamped() : new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+    }
+
+    void Start() {
         RandomPointerEventData = new PointerEventData(GetComponent<EventSystem>());
     }
 
@@ -69,15 +78,19 @@ public class LeapMouse : Singleton<LeapMouse> {
         Menus.Settings.LeapSetupXY();
     }
 
+    void DrawPointer(Vector2 Position, bool FullSize, Texture Cursor) {
+        Vector2 DrawStartPos = Position;
+        if (CenterPointer)
+            DrawStartPos -= MouseSize * (FullSize ? .6f : .5f);
+        GUI.DrawTexture(new Rect(DrawStartPos, MouseSize * (FullSize ? 1 : .8f)), Cursor);
+    }
+
     void OnGUI() {
         if (LeapMotion.Instance.IsUsed()) {
-            Vector2 DrawStartPos = HandPosition;
-            if (CenterPointer) {
-                DrawStartPos -= MouseSize * .5f;
-                if (LastFingerCount != 0)
-                    DrawStartPos -= MouseSize * .1f;
-            }
-            GUI.DrawTexture(new Rect(DrawStartPos, MouseSize * (LastFingerCount != 0 ? 1 : .8f)), MouseIcon);
+            DrawPointer(HandPosition, LastFingerCount != 0, MouseIcon);
+            if (OffHandIcon)
+                for (int OffHand = 1; OffHand < LeapMotion.Instance.GetHandCount(); ++OffHand)
+                    DrawPointer(LeapMotion.Instance.PalmOnScreenXYUnclamped(OffHand), LeapMotion.Instance.ExtendedFingers(OffHand) != 0, OffHandIcon);
         }
     }
 
