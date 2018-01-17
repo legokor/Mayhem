@@ -179,7 +179,7 @@ namespace Menus.Customization {
         }
 
         void Update() {
-            Vector2 PointerPos = LeapMouse.Instance.ScreenPosition(), HandsDist = PointerPos - LeapMotion.Instance.PalmOnScreenXYUnclamped(1);
+            Vector2 PointerPos = LeapMouse.Instance.ScreenPositionUnclamped(), HandsDist = PointerPos - LeapMotion.Instance.PalmOnScreenXYUnclamped(1);
             if (LeapMouse.Instance.Action()) {
                 if (LeapMotion.Instance.GetHandCount() > 1 && LeapMotion.Instance.ExtendedFingers(1) == 0) {
                     float Difference = (HandsDist.magnitude - LastScale.magnitude) * Sensitivity;
