@@ -58,6 +58,17 @@ public class LeapMotion : Singleton<LeapMotion> {
     }
 
     /// <summary>
+    /// Calculates where the given world position should be shown on or off screen.
+    /// </summary>
+    /// <param name="FromLeap">Hand position from the device</param>
+    /// <returns>Screen position</returns>
+    Vector2 ScreenFromLeapUnclamped(Vector2 FromLeap) {
+        return new Vector2(
+            (FromLeap.x - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
+            (FromLeap.y - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y) * Screen.height);
+    }
+
+    /// <summary>
     /// Calculates where the given world position should be shown on screen.
     /// </summary>
     /// <param name="FromLeap">Hand position from the device</param>
@@ -106,6 +117,20 @@ public class LeapMotion : Singleton<LeapMotion> {
         if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
             Hand CheckedHand = Device.Frame().Hands[HandID];
             return ScreenFromLeap(new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y));
+        } else {
+            return NotAvailable;
+        }
+    }
+
+    /// <summary>
+    /// Palm position on or off screen, on a vertical plane.
+    /// </summary>
+    /// <param name="HandID">Hand ID</param>
+    /// <returns>Palm position on screen, or (-1, -1) if there's no hand</returns>
+    public Vector2 PalmOnScreenXYUnclamped(int HandID = 0) {
+        if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
+            Hand CheckedHand = Device.Frame().Hands[HandID];
+            return ScreenFromLeapUnclamped(new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y));
         } else {
             return NotAvailable;
         }
