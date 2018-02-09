@@ -11,7 +11,7 @@ namespace Menus {
         /// </summary>
         public static void Unload() {
             _Music = _HQAudio = _MotionBlur = _FollowerCamera = null;
-            LeapSetupXY();
+            LeapSetup();
         }
 
         /// <summary>
@@ -90,19 +90,9 @@ namespace Menus {
         /// <summary>
         /// Set Leap Motion bounds for use on a vertical plane.
         /// </summary>
-        public static void LeapSetupXY() {
-            Vector3 Lower = LeapLowerBounds, Upper = LeapUpperBounds;
-            LeapMotion.Instance.LeapLowerBounds = new Vector2(Lower.x, Lower.y);
-            LeapMotion.Instance.LeapUpperBounds = new Vector2(Upper.x, Upper.y);
-        }
-
-        /// <summary>
-        /// Set Leap Motion bounds for use on a horizontal plane.
-        /// </summary>
-        public static void LeapSetupXZ() {
-            Vector3 Lower = LeapLowerBounds, Upper = LeapUpperBounds;
-            LeapMotion.Instance.LeapLowerBounds = new Vector2(Lower.x, Lower.z);
-            LeapMotion.Instance.LeapUpperBounds = new Vector2(Upper.x, Upper.z);
+        public static void LeapSetup() {
+            LeapMotion.Instance.LeapLowerBounds = LeapLowerBounds;
+            LeapMotion.Instance.LeapUpperBounds = LeapUpperBounds;
         }
     }
 }

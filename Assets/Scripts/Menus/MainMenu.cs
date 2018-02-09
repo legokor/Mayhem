@@ -67,7 +67,7 @@ namespace Menus {
         void ApplyCalibration(Vector3 Minimums, Vector3 Maximums) {
             Settings.LeapLowerBounds = Minimums;
             Settings.LeapUpperBounds = Maximums;
-            Settings.LeapSetupXY();
+            Settings.LeapSetup();
         }
 
         void Start() {
@@ -83,7 +83,7 @@ namespace Menus {
                 MaxLevel = LevelSelectorObject.transform.childCount - 1;
                 Calibration.Instance.gameObject.SetActive(false);
                 Calibration.Instance.CalibrationResult += ApplyCalibration;
-                Settings.LeapSetupXY();
+                Settings.LeapSetup();
                 CavernText.text = "Cavern output: " + AudioListener3D.GetLayoutName();
             }
         }

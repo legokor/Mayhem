@@ -74,10 +74,6 @@ public class LeapMouse : Singleton<LeapMouse> {
         RandomPointerEventData = new PointerEventData(GetComponent<EventSystem>());
     }
 
-    void OnEnable() {
-        Menus.Settings.LeapSetupXY();
-    }
-
     void DrawPointer(Vector2 Position, bool FullSize, Texture Cursor) {
         Vector2 DrawStartPos = Position;
         if (CenterPointer)

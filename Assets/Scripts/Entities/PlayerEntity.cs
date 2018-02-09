@@ -99,7 +99,6 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         Weapon = WeaponBase.AttachWeapon(WeaponKinds.Unassigned, gameObject);
         WeaponPickup(WeaponKinds.Photon);
         Source = GetComponent<AudioSource3D>();
-        Settings.LeapSetupXZ();
         Customize.DeserializeTo(transform.GetChild(0).gameObject);
     }
 
@@ -131,6 +130,8 @@ public class PlayerEntity : Singleton<PlayerEntity> {
     }
 
     void Update() {
+        if (Time.deltaTime == 0)
+            return;
         if (Lives == 0) {
             if (!GameOverScreen.activeInHierarchy) {
                 GameOverScreen.SetActive(true);

@@ -120,6 +120,13 @@ namespace Helpers {
         }
 
         /// <summary>
+        /// Set up the Leap controller to the user's preferred bounds while loading.
+        /// </summary>
+        void Awake() {
+            Settings.LeapSetup();
+        }
+
+        /// <summary>
         /// Scroll and spawn environment and enemies each frame.
         /// </summary>
         void LateUpdate() {

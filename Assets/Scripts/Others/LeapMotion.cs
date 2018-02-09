@@ -6,10 +6,10 @@ using UnityEngine;
 /// </summary>
 [AddComponentMenu("Others / Leap Motion")]
 public class LeapMotion : Singleton<LeapMotion> {
-    [Tooltip("Bottom of hand detection bounds when used in 2D.")]
-    public Vector2 LeapLowerBounds = new Vector2(-200, -112.5f);
-    [Tooltip("Top of hand detection bounds when used in 2D.")]
-    public Vector2 LeapUpperBounds = new Vector2(200, 112.5f);
+    [Tooltip("Lower values of hand detection bounds.")]
+    public Vector3 LeapLowerBounds = new Vector3(-200, 100, -112.5f);
+    [Tooltip("Upper values of hand detection bounds.")]
+    public Vector3 LeapUpperBounds = new Vector3(200, 300, 112.5f);
 
     /// <summary>
     /// Connected Leap Motion device.
@@ -47,39 +47,6 @@ public class LeapMotion : Singleton<LeapMotion> {
     }
 
     /// <summary>
-    /// Calculates where the given world position should be shown on screen.
-    /// </summary>
-    /// <param name="FromLeap">Hand position from the device</param>
-    /// <returns>Screen position</returns>
-    Vector2 ScreenFromLeap(Vector2 FromLeap) {
-        return new Vector2(
-            (Mathf.Clamp(FromLeap.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
-            (Mathf.Clamp(FromLeap.y, LeapLowerBounds.y, LeapUpperBounds.y) - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y) * Screen.height);
-    }
-
-    /// <summary>
-    /// Calculates where the given world position should be shown on or off screen.
-    /// </summary>
-    /// <param name="FromLeap">Hand position from the device</param>
-    /// <returns>Screen position</returns>
-    Vector2 ScreenFromLeapUnclamped(Vector2 FromLeap) {
-        return new Vector2(
-            (FromLeap.x - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
-            (FromLeap.y - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y) * Screen.height);
-    }
-
-    /// <summary>
-    /// Calculates where the given world position should be shown on screen.
-    /// </summary>
-    /// <param name="FromLeap">Hand position from the device</param>
-    /// <returns>Viewport position</returns>
-    Vector2 ViewportFromLeap(Vector2 FromLeap) {
-        return new Vector2(
-            (Mathf.Clamp(FromLeap.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x),
-            (Mathf.Clamp(FromLeap.y, LeapLowerBounds.y, LeapUpperBounds.y) - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y));
-    }
-
-    /// <summary>
     /// Check if the user is using the controller.
     /// </summary>
     /// <returns>True if there are any hands detected</returns>
@@ -105,7 +72,7 @@ public class LeapMotion : Singleton<LeapMotion> {
             Vector Pos = Device.Frame().Hands[HandID].PalmPosition;
             return new Vector3(Pos.x, Pos.y, Pos.z);
         } else
-            return Vector3.zero;
+            return NotAvailable;
     }
 
     /// <summary>
@@ -116,7 +83,10 @@ public class LeapMotion : Singleton<LeapMotion> {
     public Vector2 PalmOnScreenXY(int HandID = 0) {
         if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
             Hand CheckedHand = Device.Frame().Hands[HandID];
-            return ScreenFromLeap(new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y));
+            Vector2 FromLeap = new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y);
+            return new Vector2(
+                (Mathf.Clamp(FromLeap.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
+                (Mathf.Clamp(FromLeap.y, LeapLowerBounds.y, LeapUpperBounds.y) - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y) * Screen.height);
         } else {
             return NotAvailable;
         }
@@ -130,7 +100,9 @@ public class LeapMotion : Singleton<LeapMotion> {
     public Vector2 PalmOnScreenXYUnclamped(int HandID = 0) {
         if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
             Hand CheckedHand = Device.Frame().Hands[HandID];
-            return ScreenFromLeapUnclamped(new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y));
+            Vector2 FromLeap = new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y);
+            return new Vector2((FromLeap.x - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
+                (FromLeap.y - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y) * Screen.height);
         } else {
             return NotAvailable;
         }
@@ -144,7 +116,10 @@ public class LeapMotion : Singleton<LeapMotion> {
     public Vector2 PalmOnViewportXY(int HandID = 0) {
         if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
             Hand CheckedHand = Device.Frame().Hands[HandID];
-            return ViewportFromLeap(new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y));
+            Vector2 FromLeap = new Vector2(CheckedHand.PalmPosition.x, -CheckedHand.PalmPosition.y + LeapLowerBounds.y + LeapUpperBounds.y);
+            return new Vector2(
+                (Mathf.Clamp(FromLeap.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x),
+                (Mathf.Clamp(FromLeap.y, LeapLowerBounds.y, LeapUpperBounds.y) - LeapLowerBounds.y) / (LeapUpperBounds.y - LeapLowerBounds.y));
         } else {
             return NotAvailable;
         }
@@ -158,7 +133,11 @@ public class LeapMotion : Singleton<LeapMotion> {
     public Vector2 PalmOnScreenXZ(int HandID = 0) {
         if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
             Hand CheckedHand = Device.Frame().Hands[HandID];
-            return ScreenFromLeap(new Vector2(CheckedHand.PalmPosition.x, CheckedHand.PalmPosition.z));
+            return new Vector2(
+                (Mathf.Clamp(CheckedHand.PalmPosition.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) /
+                (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
+                (Mathf.Clamp(CheckedHand.PalmPosition.z, LeapLowerBounds.z, LeapUpperBounds.z) - LeapLowerBounds.z) /
+                (LeapUpperBounds.z - LeapLowerBounds.z) * Screen.height);
         } else {
             return NotAvailable;
         }
@@ -172,30 +151,42 @@ public class LeapMotion : Singleton<LeapMotion> {
     public Vector2 PalmOnViewportXZ(int HandID = 0) {
         if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
             Hand CheckedHand = Device.Frame().Hands[HandID];
-            return ViewportFromLeap(new Vector2(CheckedHand.PalmPosition.x, CheckedHand.PalmPosition.z));
+            return new Vector2(
+                (Mathf.Clamp(CheckedHand.PalmPosition.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) / (LeapUpperBounds.x - LeapLowerBounds.x),
+                (Mathf.Clamp(CheckedHand.PalmPosition.z, LeapLowerBounds.z, LeapUpperBounds.z) - LeapLowerBounds.z) / (LeapUpperBounds.z - LeapLowerBounds.z));
         } else {
             return NotAvailable;
         }
     }
 
     /// <summary>
-    /// Furthest tip on screen.
+    /// Furthest tip on screen on a vertical plane.
     /// </summary>
     /// <param name="HandID">Hand ID</param>
     /// <returns>Furthest tip position on screen, or (-1, -1) if there's no hand</returns>
-    public Vector2 SinglePointOnScreen(int HandID = 0) {
+    public Vector2 SinglePointOnScreenXY(int HandID = 0) {
         if (Device.IsConnected && Device.Frame().Hands.Count > HandID) {
             Hand CurrentHand = Device.Frame().Hands[HandID];
             Finger Furthest = CurrentHand.Fingers[0];
             foreach (Finger CheckedFinger in CurrentHand.Fingers)
                 if (Furthest.StabilizedTipPosition.z > CheckedFinger.StabilizedTipPosition.z)
                     Furthest = CheckedFinger;
-            return ScreenFromLeap(new Vector2(Furthest.StabilizedTipPosition.x, Furthest.StabilizedTipPosition.y));
+            return new Vector2(
+                (Mathf.Clamp(Furthest.StabilizedTipPosition.x, LeapLowerBounds.x, LeapUpperBounds.x) - LeapLowerBounds.x) /
+                (LeapUpperBounds.x - LeapLowerBounds.x) * Screen.width,
+                (Mathf.Clamp(Furthest.StabilizedTipPosition.y, LeapLowerBounds.y, LeapUpperBounds.y) - LeapLowerBounds.y) /
+                (LeapUpperBounds.y - LeapLowerBounds.y) * Screen.height);
         } else {
             return NotAvailable;
         }
     }
 
+    /// <summary>
+    /// Planar hand movement delta calculation.
+    /// </summary>
+    /// <param name="CurrentPosition">Current screen position</param>
+    /// <param name="LastPositionHolder">Holder for the last position</param>
+    /// <returns>Hand movement on the plane in pixels or viewport scale</returns>
     public Vector2 ScreenDelta(Vector2 CurrentPosition, ref Vector2 LastPositionHolder) {
         if (CurrentPosition == NotAvailable || LastPositionHolder == NotAvailable) {
             LastPositionHolder = CurrentPosition;
