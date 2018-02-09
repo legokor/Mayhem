@@ -84,14 +84,14 @@ namespace Helpers {
             if (DisplayTime > 0) {
                 float Fade = Mathf.Min(1 - Mathf.Abs(DisplayTime - 2), 0) * 400;
                 DisplayTime -= Time.deltaTime * .5f;
-                GUI.DrawTexture(new Rect(Fade, 100, 200, 50), OuterTexture);
-                GUI.DrawTexture(new Rect(Fade, 102, 198, 46), InnerTexture);
+                SBS.StereoTexture(new Rect(Fade, 100, 200, 50), OuterTexture);
+                SBS.StereoTexture(new Rect(Fade, 102, 198, 46), InnerTexture);
                 GUI.skin.label.alignment = TextAnchor.MiddleCenter;
                 GUI.skin.label.fontSize = 14;
                 GUI.skin.label.fontStyle = FontStyle.Italic;
-                GUI.Label(new Rect(Fade, 105, 200, 20), Artist);
+                SBS.StereoLabel(new Rect(Fade, 105, 200, 20), Artist);
                 GUI.skin.label.fontStyle = FontStyle.BoldAndItalic;
-                GUI.Label(new Rect(Fade, 125, 200, 20), Song);
+                SBS.StereoLabel(new Rect(Fade, 125, 200, 20), Song);
             }
         }
 

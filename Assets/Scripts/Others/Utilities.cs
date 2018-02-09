@@ -20,9 +20,9 @@ public static class Utilities {
     /// <param name="Thickness">Thickness</param>
     /// <param name="Tex">Texture</param>
     public static void GUIRectangle(int Left, int Top, int Width, int Height, int Thickness, Texture2D Tex) {
-        GUI.DrawTexture(new Rect(Left, Top, Width, Thickness), Tex);
-        GUI.DrawTexture(new Rect(Left, Top, Thickness, Height), Tex);
-        GUI.DrawTexture(new Rect(Left, Top + Height - Thickness, Width, Thickness), Tex);
-        GUI.DrawTexture(new Rect(Left + Width - Thickness, Top, Thickness, Height), Tex);
+        SBS.StereoTexture(new Rect(Left, Top, Width, Thickness), Tex);
+        SBS.StereoTexture(new Rect(Left, Top, Thickness, Height), Tex);
+        SBS.StereoTexture(new Rect(Left, Top + Height - Thickness, Width, Thickness), Tex);
+        SBS.StereoTexture(new Rect(Left + Width - Thickness, Top, Thickness, Height), Tex);
     }
 }

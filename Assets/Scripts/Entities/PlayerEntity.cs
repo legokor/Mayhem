@@ -117,16 +117,16 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         Utilities.GUIRectangle(Margin, BarTop, BarWidth, Margin, Thickness, GUIColor);
         Utilities.GUIRectangle(BarLeft, BarTop, BarWidth, Margin, Thickness, GUIColor);
         BarWidth -= 2 * Thickness;
-        GUI.DrawTexture(new Rect(MpT, BarTop, Weapon.Level == 5 ? BarWidth : (BarWidth * Weapon.XP / 25), Margin), GUITransparency);
+        SBS.StereoTexture(new Rect(MpT, BarTop, Weapon.Level == 5 ? BarWidth : (BarWidth * Weapon.XP / 25), Margin), GUITransparency);
         GUI.skin.label.alignment = TextAnchor.MiddleLeft;
-        GUI.Label(new Rect(MpT + 10, BarTop, BarWidth, Margin), "LEVEL " + Weapon.Level + " " + Weapon.DisplayName);
-        GUI.DrawTexture(new Rect(BarLeft + Thickness, BarTop, BarWidth * Health / 100, Margin), GUITransparency);
+        SBS.StereoLabel(new Rect(MpT + 10, BarTop, BarWidth, Margin), "LEVEL " + Weapon.Level + " " + Weapon.DisplayName);
+        SBS.StereoTexture(new Rect(BarLeft + Thickness, BarTop, BarWidth * Health / 100, Margin), GUITransparency);
         GUI.skin.label.alignment = TextAnchor.MiddleRight;
-        GUI.Label(new Rect(BarLeft - 10, BarTop, BarWidth, Margin), "LIVES: " + Lives);
+        SBS.StereoLabel(new Rect(BarLeft - 10, BarTop, BarWidth, Margin), "LIVES: " + Lives);
         // Score
         GUI.skin.label.fontSize *= 2;
         GUI.skin.label.alignment = TextAnchor.LowerCenter;
-        GUI.Label(new Rect(0, 0, Screen.width, BarTop + Margin), Score.ToString());
+        SBS.StereoLabel(new Rect(0, 0, Screen.width, BarTop + Margin), Score.ToString());
     }
 
     void Update() {

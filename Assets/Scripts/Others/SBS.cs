@@ -140,7 +140,21 @@ public class SBS : MonoBehaviour {
         AddCamera(Camera.main);
     }
 
+    /// <summary>
+    /// Usable height ratio from a side image.
+    /// </summary>
+    static float WorkingHeight = 1;
+
+    /// <summary>
+    /// Top margin for side items to fit inside a 16:9  vertically centered box.
+    /// </summary>
+    static float TopMargin = 0;
+
     void Update() {
+        // UI precalculations
+        float ScreenRatio = Screen.width * .5f / Screen.height;
+        WorkingHeight = Mathf.Min(1, ScreenRatio / (16f / 9f));
+        TopMargin = (1 - WorkingHeight) * .5f * Screen.height;
         // Re-enable through scenes
         if (OtherEyes.Count != 0 && !OtherEyes[0]) {
             OtherEyes.Clear();
@@ -167,5 +181,38 @@ public class SBS : MonoBehaviour {
                 c = OtherMain;
         }
         return c.ScreenPointToRay(Position);
+    }
+
+    /// <summary>
+    /// Size a rectangle to fit in the left eye's 16:9 vertically center box.
+    /// </summary>
+    public static void PlaceInLeftEye(ref Rect Position) {
+        Position.x *= .5f;
+        Position.width *= .5f;
+        Position.y = Position.y * WorkingHeight + TopMargin;
+        Position.height *= WorkingHeight;
+    }
+
+    public static void StereoLabel(Rect Position, string Content) {
+        if (OtherMain) {
+            int OldFontSize = GUI.skin.label.fontSize;
+            GUI.skin.label.fontSize = (int)(GUI.skin.label.fontSize * WorkingHeight);
+            PlaceInLeftEye(ref Position);
+            GUI.Label(Position, Content);
+            Position.x += Screen.width * .5f;
+            GUI.Label(Position, Content);
+            GUI.skin.label.fontSize = OldFontSize;
+        } else
+            GUI.Label(Position, Content);
+    }
+
+    public static void StereoTexture(Rect Position, Texture Texture) {
+        if (OtherMain) {
+            PlaceInLeftEye(ref Position);
+            GUI.DrawTexture(Position, Texture);
+            Position.x += Screen.width * .5f;
+            GUI.DrawTexture(Position, Texture);
+        } else
+            GUI.DrawTexture(Position, Texture);
     }
 }
