@@ -10,6 +10,8 @@ namespace Menus {
     public class ProfileSwitcher : MonoBehaviour {
         [Tooltip("Sample button.")]
         public Button Sample;
+        [Tooltip("Profile list viewport content.")]
+        public GameObject ProfileList;
 
         /// <summary>
         /// Vertical distance beetween buttons.
@@ -54,14 +56,15 @@ namespace Menus {
             Sample = LastButton;
         }
 
-        /// <summary>
-        /// Temporary fix for Unity 2017.3.0, as repositioning after instantiating is bugged.
-        /// </summary>
         void Update() {
+            // Temporary fix for Unity 2017.3.0, as repositioning after instantiating is bugged.
             Transform ButtonHolder = Sample.transform.parent;
             float InitialX = Sample.transform.localPosition.x;
             for (int ProfileID = 0; ProfileID < ButtonHolder.childCount; ++ProfileID)
                 ButtonHolder.GetChild(ProfileID).localPosition = new Vector3(InitialX, -ProfileID * ButtonDistance);
+            // Scrolling
+            ProfileList.transform.position += new Vector3(0, (-Input.GetAxis("Vertical") * Time.deltaTime -
+                Input.GetAxis("Mouse ScrollWheel") * ProfileList.transform.lossyScale.y * ButtonDistance * 30));
         }
 
         /// <summary>
