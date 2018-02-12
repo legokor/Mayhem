@@ -60,14 +60,22 @@ public class LeapMouse : Singleton<LeapMouse> {
     /// Gets the pointer (mouse or main hand) position on screen.
     /// </summary>
     public Vector2 ScreenPosition() {
-        return LeapMotion.Instance.IsUsed() ? LeapMotion.Instance.PalmOnScreenXY() : new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+        if (LeapMotion.Instance.IsUsed()) {
+            Vector2 LeapPos = LeapMotion.Instance.PalmOnScreenXY();
+            return SBS.Enabled ? new Vector2(LeapPos.x * .5f, LeapPos.y) : LeapPos;
+        } else
+            return new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
     }
 
     /// <summary>
     /// Gets the pointer (mouse or main hand) position on or off screen.
     /// </summary>
     public Vector2 ScreenPositionUnclamped() {
-        return LeapMotion.Instance.IsUsed() ? LeapMotion.Instance.PalmOnScreenXYUnclamped() : new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+        if (LeapMotion.Instance.IsUsed()) {
+            Vector2 LeapPos = LeapMotion.Instance.PalmOnScreenXYUnclamped();
+            return SBS.Enabled ? new Vector2(LeapPos.x * .5f, LeapPos.y) : LeapPos;
+        } else
+            return new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
     }
 
     void Start() {
@@ -79,14 +87,22 @@ public class LeapMouse : Singleton<LeapMouse> {
         if (CenterPointer)
             DrawStartPos -= MouseSize * (FullSize ? .6f : .5f);
         GUI.DrawTexture(new Rect(DrawStartPos, MouseSize * (FullSize ? 1 : .8f)), Cursor);
+        if (SBS.Enabled) {
+            float HalfWidth = Screen.width * .5f;
+            DrawStartPos.x += DrawStartPos.x < HalfWidth ? HalfWidth : -HalfWidth;
+            GUI.DrawTexture(new Rect(DrawStartPos, MouseSize * (FullSize ? 1 : .8f)), Cursor);
+        }
     }
 
     void OnGUI() {
         if (LeapMotion.Instance.IsUsed()) {
             DrawPointer(HandPosition, LastFingerCount != 0, MouseIcon);
-            if (OffHandIcon)
-                for (int OffHand = 1; OffHand < LeapMotion.Instance.GetHandCount(); ++OffHand)
-                    DrawPointer(LeapMotion.Instance.PalmOnScreenXYUnclamped(OffHand), LeapMotion.Instance.ExtendedFingers(OffHand) != 0, OffHandIcon);
+            if (OffHandIcon) {
+                for (int OffHand = 1; OffHand < LeapMotion.Instance.GetHandCount(); ++OffHand) {
+                    Vector2 LeapPos = LeapMotion.Instance.PalmOnScreenXYUnclamped(OffHand);
+                    DrawPointer(SBS.Enabled ? new Vector2(LeapPos.x * .5f, LeapPos.y) : LeapPos, LeapMotion.Instance.ExtendedFingers(OffHand) != 0, OffHandIcon);
+                }
+            }
         }
     }
 
