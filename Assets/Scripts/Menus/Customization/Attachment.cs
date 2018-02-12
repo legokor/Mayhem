@@ -125,12 +125,13 @@ namespace Menus.Customization {
             }
             // Snap to the body and placement
             if (Physics.Raycast(LeapMouse.ScreenPointToRay(), out Hit)) {
-                Transform BodyT = Body.transform;
-                if (Hit.collider.gameObject == Body || Hit.collider.transform.parent.parent == Body.transform) {
+                Transform BodyT = Body.transform, CollisionParent = Hit.collider.transform.parent.parent;
+                if (Hit.collider.gameObject == Body || (CollisionParent && CollisionParent == Body.transform)) {
                     Vector3 Diff = BodyT.InverseTransformPoint(Hit.point) * BodyT.localScale.x;
                     transform.position = Hit.point;
                     transform.rotation = Quaternion.LookRotation(BodyT.forward, Hit.normal);
-                    transform.localScale = new Vector3(BodyT.localScale.x + Convert.ToSingle(Diff.x < 0) * -2 * BodyT.localScale.x, BodyT.localScale.y, BodyT.localScale.z);
+                    transform.localScale = new Vector3(BodyT.localScale.x + Convert.ToSingle(Diff.x < 0) * -2 * BodyT.localScale.x,
+                        BodyT.localScale.y, BodyT.localScale.z);
                     PlaceCounterpart();
                     if (LeapMouse.Instance.ActionDown())
                         Attach();
