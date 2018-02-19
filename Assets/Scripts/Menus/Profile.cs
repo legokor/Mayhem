@@ -52,8 +52,7 @@ namespace Menus {
         /// Tokens available to buy parts.
         /// </summary>
         public static int Tokens {
-            get { return GetInt("Tokens", 3); }
-            set { SetInt("Tokens", value); }
+            get { return 3 + TopScore / 10000; }
         }
 
         /// <summary>

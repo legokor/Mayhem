@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System;
 
+using LeapVR;
+
 namespace Menus {
     /// <summary>
     /// Setting holder.

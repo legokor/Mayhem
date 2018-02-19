@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+using LeapVR;
+
 namespace Menus {
     [AddComponentMenu("Menus / Calibration")]
     class Calibration : Singleton<Calibration> {

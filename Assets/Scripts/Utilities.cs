@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+using LeapVR;
+
 /// <summary>
 /// Some helpers that doesn't fit anywhere.
 /// </summary>

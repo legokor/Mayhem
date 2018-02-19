@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+using LeapVR;
+
 namespace Menus.Customization {
     /// <summary>
     /// A visual component of the player's ship.

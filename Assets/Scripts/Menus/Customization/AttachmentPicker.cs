@@ -27,7 +27,7 @@ namespace Menus.Customization {
         /// Called when the button is clicked, spawns the attachment.
         /// </summary>
         public void Pick() {
-            if (!Customization.Attachment.PickedUp) {
+            if (Customize.Instance.Pick()) {
                 GameObject NewInstance = Instantiate(Attachment);
                 NewInstance.GetComponent<Attachment>().Body = Customize.Instance.Body;
                 NewInstance.GetComponentInChildren<Renderer>().material = Customize.Instance.GetMaterial();

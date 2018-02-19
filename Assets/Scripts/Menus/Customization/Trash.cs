@@ -7,6 +7,8 @@ namespace Menus.Customization {
     [AddComponentMenu("Menus / Customization / Trash")]
     public class Trash : MonoBehaviour {
         public void Use() {
+            if (Attachment.PickedUp)
+                Customize.Instance.OnRemove();
             Attachment.DestroyPickedUp();
         }
     }

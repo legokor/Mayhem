@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using Cavern;
+using LeapVR;
 
 using Destructors;
 using Helpers;

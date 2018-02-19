@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
+
+using LeapVR;
 
 namespace Menus.Customization {
     /// <summary>
@@ -12,6 +15,8 @@ namespace Menus.Customization {
         public float Sensitivity = 1f;
         [Tooltip("The ship's main body to build on.")]
         public GameObject Body;
+        [Tooltip("The text displaying remaining part tokens.")]
+        public Text TokensText;
         [Tooltip("Possible components to attach.")]
         public GameObject[] Attachments;
         [Tooltip("Selectable colors for the ship.")]
@@ -46,7 +51,16 @@ namespace Menus.Customization {
         /// </summary>
         Vector3 StartPosition;
 
-        void Start() {
+        /// <summary>
+        /// Available part tokens.
+        /// </summary>
+        int Tokens {
+            get { return _Tokens; }
+            set { TokensText.text = "Part tokens: " + (_Tokens = value); }
+        }
+        int _Tokens;
+
+        void Awake() {
             AttachmentCopies = (GameObject[])Attachments.Clone();
             ColorCopies = (Material[])Colors.Clone();
             StartPosition = Body.transform.position;
@@ -69,6 +83,24 @@ namespace Menus.Customization {
         public void SelectColor(int ColorID) {
             ApplyColorTo(ColorID, Body);
             SelectedColor = ColorID;
+        }
+
+        /// <summary>
+        /// Is it possible to pick up a new attachment from the UI?
+        /// </summary>
+        public bool Pick() {
+            if (!Attachment.PickedUp && Tokens > 0) {
+                --Tokens;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Called when an attachment were removed.
+        /// </summary>
+        public void OnRemove() {
+            ++Tokens;
         }
 
         /// <summary>
@@ -146,9 +178,9 @@ namespace Menus.Customization {
         /// <summary>
         /// Loads the saved player ship on a given GameObject.
         /// </summary>
-        public static void DeserializeTo(GameObject Target) {
+        public static int DeserializeTo(GameObject Target) {
             string[] Ship = Profile.GetString("Ship", "").Split(';');
-            int ShipPos = 0, MaxPos = Ship.Length;
+            int ShipPos = 0, MaxPos = Ship.Length, Components = 0;
             while (MaxPos - ShipPos >= 7) {
                 string Name = Ship[ShipPos++];
                 int Obj = 0, Objs = AttachmentCopies.Length;
@@ -164,8 +196,10 @@ namespace Menus.Customization {
                 AttachmentTransform.localPosition = Position;
                 AttachmentTransform.localEulerAngles = EulerAngles;
                 AttachmentTransform.localScale = new Vector3(1, 1, 1);
+                ++Components;
             }
             ApplyColorTo(Profile.GetInt("ShipColor", 0), Target);
+            return Components;
         }
 
         /// <summary>
@@ -175,7 +209,7 @@ namespace Menus.Customization {
             Body.transform.position = StartPosition;
             Body.transform.rotation = StartRotation;
             Cleanup();
-            DeserializeTo(Body);
+            Tokens = Profile.Tokens - DeserializeTo(Body);
         }
 
         void Update() {

@@ -2,6 +2,7 @@
 using System;
 
 using Cavern;
+using LeapVR;
 
 using Menus;
 
