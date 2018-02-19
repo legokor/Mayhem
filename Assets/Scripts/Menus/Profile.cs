@@ -174,7 +174,7 @@ namespace Menus {
         /// List of possible key names for a profile.
         /// </summary>
         readonly static string[] AllKeyNames = {
-            "TopScore", "Unlocks", "Tokens", // Progression
+            "TopScore", "Unlocks", // Progression
             "Ship", "ShipColor", // Customization
             "Music", "HQAudio", "Sketch", "MotionBlur", "ThreeD", "FollowerCamera", "LeapMin", "LeapMax" // Settings
         };
