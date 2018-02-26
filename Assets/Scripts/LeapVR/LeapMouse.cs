@@ -6,6 +6,7 @@ namespace LeapVR {
     /// <summary>
     /// Unity UI mouse simulation for Leap Motion.
     /// </summary>
+    [DefaultExecutionOrder(int.MinValue + 1000 + 100)]
     [AddComponentMenu("Leap VR / Leap Mouse")]
     public class LeapMouse : Singleton<LeapMouse> {
         [Tooltip("Cursor texture.")]
@@ -43,7 +44,7 @@ namespace LeapVR {
         /// </summary>
         public static Ray ScreenPointToRay() {
             Vector2 LeapPosition = LeapMotion.Instance.PalmOnScreenXY();
-            return SBS.StereoRay(LeapMotion.Instance.IsUsed() ? new Vector3(LeapPosition.x, Screen.height - LeapPosition.y) : Input.mousePosition);
+            return SBS.StereoRay(LeapPosition != LeapMotion.NotAvailable ? new Vector3(LeapPosition.x, Screen.height - LeapPosition.y) : Input.mousePosition);
         }
 
         /// <summary>
