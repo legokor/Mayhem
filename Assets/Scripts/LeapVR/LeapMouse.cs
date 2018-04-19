@@ -132,6 +132,8 @@ namespace LeapVR {
                     if (ActionDown()) {
                         if (Hovered.GetType() == typeof(Button))
                             ((Button)Hovered).OnPointerClick(RandomPointerEventData);
+                        else if (Hovered.GetType() == typeof(Toggle))
+                            ((Toggle)Hovered).isOn ^= true;
                         else
                             Hovered.Select();
                     }
