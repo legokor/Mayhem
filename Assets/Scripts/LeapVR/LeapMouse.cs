@@ -44,7 +44,7 @@ namespace LeapVR {
         /// </summary>
         public static Ray ScreenPointToRay() {
             Vector2 LeapPosition = LeapMotion.Instance.PalmOnScreenXY();
-            return SBS.StereoRay(LeapPosition != LeapMotion.NotAvailable ? new Vector3(LeapPosition.x, Screen.height - LeapPosition.y) : Input.mousePosition);
+            return SBS.StereoRay(LeapPosition != LeapMotion.NotAvailable ? new Vector3(LeapPosition.x * .5f, Screen.height - LeapPosition.y) : Input.mousePosition);
         }
 
         /// <summary>
