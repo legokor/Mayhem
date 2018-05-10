@@ -103,10 +103,6 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         Customize.DeserializeTo(transform.GetChild(0).gameObject);
     }
 
-    void Start() {
-        AudioListener3D.EnvironmentSize *= 10;
-    }
-
     void OnGUI() {
         if (Lives == 0) // Game over
             return;
