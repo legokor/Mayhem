@@ -13,7 +13,7 @@ namespace Helpers {
     /// </summary>
     [AddComponentMenu("Helpers / Random Music")]
     [RequireComponent(typeof(AudioSource3D))]
-    public class RandomMusic : MonoBehaviour {
+    public class RandomMusic : Singleton<RandomMusic> {
         /// <summary>
         /// Music clip with replay gain.
         /// </summary>
