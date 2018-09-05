@@ -67,9 +67,6 @@
         <member name="F:Cavern.AudioListener3D.MaxGain">
             <summary>Maximal gain across all channels.</summary>
         </member>
-        <member name="F:Cavern.AudioListener3D.LastSamples">
-            <summary>Last samples for each channel, required for low-pass filtering LFE channels.</summary>
-        </member>
         <member name="F:Cavern.AudioListener3D.ChannelGains">
             <summary>Distance-based gain for each channel.</summary>
         </member>
@@ -93,6 +90,9 @@
         </member>
         <member name="F:Cavern.AudioListener3D.ChannelCache">
             <summary>Cached <see cref="F:Cavern.AudioListener3D.Channels"/> for change detection.</summary>
+        </member>
+        <member name="F:Cavern.AudioListener3D.Lowpasses">
+            <summary>Lowpass filters for each channel.</summary>
         </member>
         <member name="M:Cavern.AudioListener3D.ResetFunc">
             <summary>Reset the listener after any change.</summary>
@@ -177,7 +177,7 @@
         <member name="F:Cavern.AudioListener3D.Channels">
             <summary>Output channel data. Set by the user and applied when an <see cref="T:Cavern.AudioListener3D"/> is created. The default setup is the standard 5.1 layout.</summary>
         </member>
-        <member name="F:Cavern.AudioListener3D.EnvironmentType">
+        <member name="P:Cavern.AudioListener3D.EnvironmentType">
             <summary>3D environment type. Set by the user and applied when an <see cref="T:Cavern.AudioListener3D"/> is created.</summary>
         </member>
         <member name="F:Cavern.AudioListener3D.EnvironmentSize">
@@ -197,7 +197,7 @@
         <member name="F:Cavern.AudioListener3D.EnvironmentCompensation">
             <summary>
             Automatically set channel volumes based on
-            <see cref="F:Cavern.AudioListener3D.EnvironmentSize"/> and <see cref="F:Cavern.AudioListener3D.EnvironmentType"/>.
+            <see cref="F:Cavern.AudioListener3D.EnvironmentSize"/> and <see cref="P:Cavern.AudioListener3D.EnvironmentType"/>.
             Not recommended for calibrated systems. Set by the user and
             applied when an AudioListener3D is created.
             </summary>
@@ -265,9 +265,6 @@
         <member name="F:Cavern.AudioSource3D.LastDistance">
             <summary><see cref="F:Cavern.AudioSource3D.Distance"/> in the previous frame, required for Doppler effect calculation.</summary>
         </member>
-        <member name="F:Cavern.AudioSource3D.LastLowpassedSample">
-            <summary>The last sample past the filter is required for lowpass effects.</summary>
-        </member>
         <member name="F:Cavern.AudioSource3D.OldEchoVolume">
             <summary>Cached <see cref="F:Cavern.AudioSource3D.EchoVolume"/> after <see cref="F:Cavern.AudioListener3D.HeadphoneVirtualizer"/> was set.</summary>
         </member>
@@ -280,6 +277,18 @@
         <member name="F:Cavern.AudioSource3D.EchoBuffer">
             <summary>Past output samples for echo effect.</summary>
         </member>
+        <member name="F:Cavern.AudioSource3D.LeftSamples">
+            <summary>Stereo mix cache to save allocation times.</summary>
+        </member>
+        <member name="F:Cavern.AudioSource3D.RightSamples">
+            <summary>Stereo mix cache to save allocation times.</summary>
+        </member>
+        <member name="F:Cavern.AudioSource3D.Rendered">
+            <summary>Rendered output array kept to save allocation time.</summary>
+        </member>
+        <member name="F:Cavern.AudioSource3D.Samples">
+            <summary>Mono mix cache to save allocation times.</summary>
+        </member>
         <member name="F:Cavern.AudioSource3D.OriginalSamples">
             <summary>Sample buffer from the clip.</summary>
         </member>
@@ -289,6 +298,9 @@
         <member name="F:Cavern.AudioSource3D.Node">
             <summary>Linked list access for the sources' list.</summary>
         </member>
+        <member name="F:Cavern.AudioSource3D.LPF">
+            <summary>Lowpass filter for <see cref="F:Cavern.AudioSource3D.DistanceLowpass"/>.</summary>
+        </member>
         <member name="F:Cavern.AudioSource3D.LastPosition">
             <summary>Last source position required for smoothing movement.</summary>
         </member>
@@ -296,12 +308,6 @@
             <summary>Gets the distance of the <see cref="T:Cavern.AudioListener3D"/> from the given position.</summary>
             <param name="From">World target</param>
             <returns>Distance of the listener and the given point</returns>
-        </member>
-        <member name="M:Cavern.AudioSource3D.MonoPitchShift(System.Single[],System.Single)">
-            <summary>Pitch-shifts a single channel.</summary>
-            <param name="Samples">Samples of the source channel</param>
-            <param name="PitchRatio">Pitch ratio</param>
-            <returns>A pitch-shifted version of the given array with the given pitch ratio</returns>
         </member>
         <member name="M:Cavern.AudioSource3D.Resample(System.Single[],System.Int32,System.Int32)">
             <summary>Resamples a single channel.</summary>
@@ -326,6 +332,10 @@
         <member name="M:Cavern.AudioSource3D.Collect">
             <summary>Process the source and returns a mix to be added to the output.</summary>
         </member>
+        <member name="T:Cavern.AudioSource3D.MatchModifierFunc">
+            <summary>Angle match value modifier.</summary>
+            <param name="Matching">Old angle match</param>
+        </member>
         <member name="M:Cavern.AudioSource3D.PowTo8(System.Single)">
             <summary>x to the power of 8.</summary>
             <param name="x">Input number</param>
@@ -336,16 +346,8 @@
             <param name="x">Input number</param>
             <returns>x^16 the fastest way possible</returns>
         </member>
-        <member name="M:Cavern.AudioSource3D.CalculateAngleMatches(System.Int32,UnityEngine.Vector3,System.Func{System.Single,System.Single})">
-            <summary>Angle match calculations.</summary>
-            <param name="Channels">Output layout channel count</param>
-            <param name="Direction">The source's direction from the <see cref="T:Cavern.AudioListener3D"/></param>
-            <param name="MatchModifier">Modifier function of angle match values</param>
-            <returns>Angle matches for each channel</returns>
-        </member>
-        <member name="M:Cavern.AudioSource3D.LinearizeAngleMatches(System.Int32,UnityEngine.Vector3,System.Func{System.Single,System.Single})">
-            <summary>Linearized <see cref="M:Cavern.AudioSource3D.CalculateAngleMatches(System.Int32,UnityEngine.Vector3,System.Func{System.Single,System.Single})"/>:
-            pi / 2 - pi / 2 * x, angle match: pi - (lin acos) = pi / 2 + pi / 2 * x.</summary>
+        <member name="T:Cavern.AudioSource3D.AngleMatchFunc">
+            <summary>Angle match calculator delegate.</summary>
             <param name="Channels">Output layout channel count</param>
             <param name="Direction">The source's direction from the <see cref="T:Cavern.AudioListener3D"/></param>
             <param name="MatchModifier">Modifier function of angle match values</param>
@@ -354,62 +356,42 @@
         <member name="F:Cavern.AudioSource3D.UsedAngleMatchFunc">
             <summary>The angle match calculator function to be used.</summary>
         </member>
-        <member name="M:Cavern.AudioSource3D.WriteOutput(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
-            <summary>Output samples to a multichannel array.</summary>
-            <param name="Samples">Samples</param>
-            <param name="Target">Multichannel array (destination)</param>
-            <param name="ChannelLength">Sample count for a single channel</param>
-            <param name="Gain">Gain</param>
-            <param name="Channel">Channel</param>
-            <param name="Channels">Channel count</param>
+        <member name="M:Cavern.AudioSource3D.CalculateAngleMatches(System.Int32,UnityEngine.Vector3,Cavern.AudioSource3D.MatchModifierFunc)">
+            <summary>Angle match calculations.</summary>
         </member>
-        <member name="M:Cavern.AudioSource3D.WriteOutputApproxCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
-            <summary>Output samples to a multichannel array with approximated constant power. The error margin is 15%.</summary>
-            <param name="Samples">Samples</param>
-            <param name="Target">Multichannel array (destination)</param>
-            <param name="ChannelLength">Sample count for a single channel</param>
-            <param name="Gain">Gain</param>
-            <param name="Channel">Channel</param>
-            <param name="Channels">Channel count</param>
+        <member name="M:Cavern.AudioSource3D.LinearizeAngleMatches(System.Int32,UnityEngine.Vector3,Cavern.AudioSource3D.MatchModifierFunc)">
+            <summary>Linearized <see cref="M:Cavern.AudioSource3D.CalculateAngleMatches(System.Int32,UnityEngine.Vector3,Cavern.AudioSource3D.MatchModifierFunc)"/>:
+            pi / 2 - pi / 2 * x, angle match: pi - (lin acos) = pi / 2 + pi / 2 * x.</summary>
         </member>
-        <member name="M:Cavern.AudioSource3D.WriteOutputCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
-            <summary>Output samples to a multichannel array with constant power.</summary>
-            <param name="Samples">Samples</param>
-            <param name="Target">Multichannel array (destination)</param>
-            <param name="ChannelLength">Sample count for a single channel</param>
-            <param name="Gain">Gain</param>
-            <param name="Channel">Channel</param>
-            <param name="Channels">Channel count</param>
-        </member>
-        <member name="M:Cavern.AudioSource3D.WriteFixedOutput(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
-            <summary>Output samples to a multichannel array, while trying to fix standing waves.</summary>
-            <param name="Samples">Samples</param>
-            <param name="Target">Multichannel array (destination)</param>
-            <param name="ChannelLength">Sample count for a single channel</param>
-            <param name="Gain">Gain</param>
-            <param name="Channel">Target channel</param>
-            <param name="Channels">Channel count</param>
-        </member>
-        <member name="M:Cavern.AudioSource3D.WriteFixedOutputApproxCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
-            <summary>Output samples to a multichannel array with approximated constant power, while trying to fix standing waves.</summary>
-            <param name="Samples">Samples</param>
-            <param name="Target">Multichannel array (destination)</param>
-            <param name="ChannelLength">Sample count for a single channel</param>
-            <param name="Gain">Gain</param>
-            <param name="Channel">Target channel</param>
-            <param name="Channels">Channel count</param>
-        </member>
-        <member name="M:Cavern.AudioSource3D.WriteFixedOutputCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
-            <summary>Output samples to a multichannel array with constant power, while trying to fix standing waves.</summary>
-            <param name="Samples">Samples</param>
-            <param name="Target">Multichannel array (destination)</param>
-            <param name="ChannelLength">Sample count for a single channel</param>
-            <param name="Gain">Gain</param>
-            <param name="Channel">Target channel</param>
-            <param name="Channels">Channel count</param>
+        <member name="T:Cavern.AudioSource3D.OutputFunc">
+            <summary>Audio output writer delegate.</summary>
+            <param name="Samples">Samples to write</param>
+            <param name="Target">Channel array to write to</param>
+            <param name="ChannelLength">Size of the source and destination arrays</param>
+            <param name="Gain">Source gain</param>
+            <param name="Channel">Channel ID</param>
+            <param name="Channels">Total channels</param>
         </member>
         <member name="F:Cavern.AudioSource3D.UsedOutputFunc">
             <summary>The audio output function to be used.</summary>
+        </member>
+        <member name="M:Cavern.AudioSource3D.WriteOutput(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
+            <summary>Output samples to a multichannel array.</summary>
+        </member>
+        <member name="M:Cavern.AudioSource3D.WriteOutputApproxCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
+            <summary>Output samples to a multichannel array with approximated constant power. The error margin is 15%.</summary>
+        </member>
+        <member name="M:Cavern.AudioSource3D.WriteOutputCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
+            <summary>Output samples to a multichannel array with constant power.</summary>
+        </member>
+        <member name="M:Cavern.AudioSource3D.WriteFixedOutput(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
+            <summary>Output samples to a multichannel array, while trying to fix standing waves.</summary>
+        </member>
+        <member name="M:Cavern.AudioSource3D.WriteFixedOutputApproxCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
+            <summary>Output samples to a multichannel array with approximated constant power, while trying to fix standing waves.</summary>
+        </member>
+        <member name="M:Cavern.AudioSource3D.WriteFixedOutputCP(System.Single[],System.Single[],System.Int32,System.Single,System.Int32,System.Int32)">
+            <summary>Output samples to a multichannel array with constant power, while trying to fix standing waves.</summary>
         </member>
         <member name="F:Cavern.AudioSource3D.Clip">
             <summary>The audio clip to play.</summary>
@@ -465,8 +447,26 @@
         <member name="P:Cavern.AudioSource3D.clip">
             <summary>Alias for <see cref="F:Cavern.AudioSource3D.Clip"/>.</summary>
         </member>
+        <member name="P:Cavern.AudioSource3D.dopplerLevel">
+            <summary>Alias for <see cref="F:Cavern.AudioSource3D.DopplerLevel"/>.</summary>
+        </member>
+        <member name="P:Cavern.AudioSource3D.isPlaying">
+            <summary>Alias for <see cref="F:Cavern.AudioSource3D.IsPlaying"/>.</summary>
+        </member>
         <member name="P:Cavern.AudioSource3D.loop">
             <summary>Alias for <see cref="F:Cavern.AudioSource3D.Loop"/>.</summary>
+        </member>
+        <member name="P:Cavern.AudioSource3D.mute">
+            <summary>Alias for <see cref="F:Cavern.AudioSource3D.Mute"/>.</summary>
+        </member>
+        <member name="P:Cavern.AudioSource3D.panStereo">
+            <summary>Alias for <see cref="F:Cavern.AudioSource3D.StereoPan"/>.</summary>
+        </member>
+        <member name="P:Cavern.AudioSource3D.pitch">
+            <summary>Alias for <see cref="F:Cavern.AudioSource3D.Pitch"/>.</summary>
+        </member>
+        <member name="P:Cavern.AudioSource3D.spatialBlend">
+            <summary>Alias for <see cref="F:Cavern.AudioSource3D.SpatialBlend"/>.</summary>
         </member>
         <member name="P:Cavern.AudioSource3D.volume">
             <summary>Alias for <see cref="F:Cavern.AudioSource3D.Volume"/>.</summary>
@@ -515,6 +515,9 @@
         </member>
         <member name="M:Cavern.AudioSource3D.RolloffDisabled">
             <summary>No rolloff.</summary>
+        </member>
+        <member name="T:Cavern.AudioSource3D.RolloffFunc">
+            <summary>Rolloff calculator function.</summary>
         </member>
         <member name="F:Cavern.AudioSource3D.UsedRolloffFunc">
             <summary>The rolloff function to be used.</summary>
@@ -614,6 +617,412 @@
         </member>
         <member name="F:Cavern.Cavern4D.Seat4D.LastHeight">
             <summary>Keep the last height for delta movement if the object is moved by something else.</summary>
+        </member>
+        <member name="T:Cavern.QuickEQ.Complex">
+            <summary>A complex number.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Complex.Real">
+            <summary>Real part of the complex number.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Complex.Imaginary">
+            <summary>Imaginary part of the complex number.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Complex.#ctor(System.Single,System.Single)">
+            <summary>Constructor from coordinates.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.Complex.Magnitude">
+            <summary>Magnitude of the complex number (spectrum for FFT).</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.Complex.Phase">
+            <summary>Direction of the complex number (phase for FFT).</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Complex.Rotate(System.Single)">
+            <summary>Multiply by (cos(x), sin(x)).</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Complex.op_Addition(Cavern.QuickEQ.Complex,Cavern.QuickEQ.Complex)">
+            <summary>Complex addition.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Complex.op_Subtraction(Cavern.QuickEQ.Complex,Cavern.QuickEQ.Complex)">
+            <summary>Complex substraction.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Complex.op_Multiply(Cavern.QuickEQ.Complex,Cavern.QuickEQ.Complex)">
+            <summary>Complex multiplication.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Complex.op_Multiply(Cavern.QuickEQ.Complex,System.Single)">
+            <summary>Scalar complex multiplication.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Complex.op_Division(Cavern.QuickEQ.Complex,Cavern.QuickEQ.Complex)">
+            <summary>Complex division.</summary>
+        </member>
+        <member name="T:Cavern.QuickEQ.Measurements">
+            <summary>Tools for measuring frequency response.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.FFT(System.Single[])">
+            <summary>Fast Fourier transform a real signal.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.FFT(Cavern.QuickEQ.Complex[])">
+            <summary>Fast Fourier transform a signal.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.ProcessIFFT(Cavern.QuickEQ.Complex[])">
+            <summary>Outputs IFFT(X) * N.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.IFFT(Cavern.QuickEQ.Complex[])">
+            <summary>Inverse Fast Fourier Transform of a transformed signal.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetRealPart(Cavern.QuickEQ.Complex[])">
+            <summary>Get the real part of a signal's FFT.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetImaginaryPart(Cavern.QuickEQ.Complex[])">
+            <summary>Get the imaginary part of a signal's FFT.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetSpectrum(Cavern.QuickEQ.Complex[])">
+            <summary>Get the gains of frequencies in a signal after FFT.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetPhase(Cavern.QuickEQ.Complex[])">
+            <summary>Get the gains of frequencies in a signal after FFT.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.LinearSweep(System.Single,System.Single,System.Int32,System.Int32)">
+            <summary>Generate a linear frequency sweep with a flat frequency response.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.LinearSweepFreqs(System.Single,System.Single,System.Int32,System.Int32)">
+            <summary>Generate the frequencies at each sample's position in a linear frequency sweep.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.ExponentialSweep(System.Single,System.Single,System.Int32,System.Int32)">
+            <summary>Generate an exponential frequency sweep.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.ExponentialSweepFreqs(System.Single,System.Single,System.Int32,System.Int32)">
+            <summary>Generate the frequencies at each sample's position in an exponential frequency sweep.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.SweepFraming(System.Single[])">
+            <summary>Add silence to the beginning and the end of a sweep for a larger response window.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetFrequencyResponse(Cavern.QuickEQ.Complex[],System.Single[])">
+            <summary>Get the frequency response using the original sweep signal's FFT as reference.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetFrequencyResponse(System.Single[],System.Single[])">
+            <summary>Get the frequency response using the original sweep signal as reference.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetImpulseResponse(Cavern.QuickEQ.Complex[])">
+            <summary>Get the complex impulse response using a precalculated frequency response.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetImpulseResponse(System.Single[],System.Single[])">
+            <summary>Get the complex impulse response using the original sweep signal as a reference.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.GetImpulseResponse(System.Single[],System.Single[],System.Int32)">
+            <summary>Get the complex impulse response faster using the original sweep signal as a reference.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.ConvertToDecibels(System.Single[])">
+            <summary>Convert a response curve to decibel scale.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.ConvertToGraph(System.Single[],System.Single,System.Single,System.Int32,System.Int32)">
+            <summary>Convert a response to logarithmically scaled cut frequency range.</summary>
+            <param name="Samples">Source response</param>
+            <param name="StartFreq">Frequency at the first position of the output</param>
+            <param name="EndFreq">Frequency at the last position of the output</param>
+            <param name="SampleRate">Sample rate of the measurement that generated the curve</param>
+            <param name="ResultSize">Length of the resulting array</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.SmoothGraph(System.Single[],System.Single,System.Single,System.Single)">
+            <summary>Apply smoothing (in octaves) on a graph drawn with <see cref="M:Cavern.QuickEQ.Measurements.ConvertToGraph(System.Single[],System.Single,System.Single,System.Int32,System.Int32)"/>.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Measurements.SmoothResponse(System.Single[],System.Int32,System.Single)">
+            <summary>Apply smoothing (in octaves) on a linear frequency response.</summary>
+        </member>
+        <member name="T:Cavern.QuickEQ.SpeakerSweeper">
+            <summary>Measures the frequency response of all output channels.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.Sweep">
+            <summary>Playable measurement signal.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.SweepResponse">
+            <summary>Microphone input.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.Listener">
+            <summary>Cached listener.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.Sweeper">
+            <summary>The sweep playback object.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.MeasurementStarted">
+            <summary>A hack to fix lost playback from the initial hanging caused by sweep generation in <see cref="M:Cavern.QuickEQ.SpeakerSweeper.OnEnable"/>.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.OldCompensation">
+            <summary>Environment compensation before the measurement. Environment compensation is off while measuring.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.OldDirectLFE">
+            <summary>LFE pass-through before the measurement. LFE pass-through is on while measuring.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.OldLFESeparation">
+            <summary>LFE separation before the measurement. LFE separation is on while measuring.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.OldVirtualizer">
+            <summary>Virtualizer before the measurement. Virtualizer is off while measuring.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.OldQuality">
+            <summary>Quality mode before the measurement. Quality is set to Low while measuring for constant gain panning.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.Workers">
+            <summary>Response evaluator tasks.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.InputDevice">
+            <summary>Name of the recording device. If empty, de system default will be used.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.StartFreq">
+            <summary>Frequency at the beginning of the sweep.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.EndFreq">
+            <summary>Frequency at the end of the sweep.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.SweepGain">
+            <summary>Measurement signal gain relative to full scale.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.SweepLength">
+            <summary>Length of the measurement signal. Must be a power of 2.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.ResultAvailable">
+            <summary>The measurement is done and responses are available.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.ExcitementResponses">
+            <summary>Raw recorded signals of output channels.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.FreqResponses">
+            <summary>Frequency responses of output channels.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.ImpResponses">
+            <summary>Impulse responses of output channels.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.SpeakerSweeper.Equalizers">
+            <summary>Room correction, equalizer for each channel.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.SpeakerSweeper.SweepFFT">
+            <summary>Measurement signal's Fourier transform for response calculation optimizations.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.SpeakerSweeper.SweepReference">
+            <summary>Measurement signal samples.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.SpeakerSweeper.Channel">
+            <summary>Channel under measurement. If <see cref="F:Cavern.QuickEQ.SpeakerSweeper.ResultAvailable"/> is false, but this equals the channel count,
+            <see cref="F:Cavern.QuickEQ.SpeakerSweeper.FreqResponses"/> are still being processed.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.SpeakerSweeper.Progress">
+            <summary>Progress of the measurement process from 0 to 1.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.SpeakerSweeper.RegenerateSweep">
+            <summary>Generate <see cref="P:Cavern.QuickEQ.SpeakerSweeper.SweepReference"/> and <see cref="P:Cavern.QuickEQ.SpeakerSweeper.SweepFFT"/>.</summary>
+        </member>
+        <member name="T:Cavern.QuickEQ.Curves">
+            <summary>EQ curve generation functions.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Curves.GenerateLinearXCurve(System.Int32,System.Int32,System.Single)">
+            <summary>Generate a linear cinema standard reference curve (X-curve) for the correction generators.</summary>
+            <param name="Length">Curve length</param>
+            <param name="SampleRate">Sample rate of the measurement that the generated curve will be used for</param>
+            <param name="Gain">Level of the flat part of the curve</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Curves.GenerateLogXCurve(System.Int32,System.Single,System.Single,System.Single)">
+            <summary>Generate a logarithmic cinema standard reference curve (X-curve) for the correction generators.</summary>
+            <param name="Length">Curve length</param>
+            <param name="StartFreq">Frequency at the beginning of the curve</param>
+            <param name="EndFreq">Frequency at the end of the curve</param>
+            <param name="Gain">Level of the flat part of the curve</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Curves.XGain(System.Single)">
+            <summary>Get the gain of the X-curve at a given frequency.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Curves.GenerateLinearIMAXCurve(System.Int32,System.Int32,System.Single)">
+            <summary>Generate a linear IMAX reference curve for the correction generators.</summary>
+            <param name="Length">Curve length</param>
+            <param name="SampleRate">Sample rate of the measurement that the generated curve will be used for</param>
+            <param name="Gain">Level of the flat part of the curve</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Curves.GenerateLogIMAXCurve(System.Int32,System.Single,System.Single,System.Single)">
+            <summary>Generate a logarithmic IMAX reference curve for the correction generators.</summary>
+            <param name="Length">Curve length</param>
+            <param name="StartFreq">Frequency at the beginning of the curve</param>
+            <param name="EndFreq">Frequency at the end of the curve</param>
+            <param name="Gain">Level of the flat part of the curve</param>
+        </member>
+        <member name="T:Cavern.QuickEQ.Equalizer">
+            <summary>Equalizer data collector and exporter.</summary>
+        </member>
+        <member name="T:Cavern.QuickEQ.Equalizer.Band">
+            <summary>A single equalizer band.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Equalizer.Band.Frequency">
+            <summary>Position of the band.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Equalizer.Band.Gain">
+            <summary>Gain at <see cref="F:Cavern.QuickEQ.Equalizer.Band.Frequency"/> in dB.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.Band.#ctor(System.Single,System.Single)">
+            <summary>EQ band constructor.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.Equalizer.Bands">
+            <summary>Bands that make up this equalizer.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.Equalizer.SubsonicRolloff">
+            <summary>Subsonic filter rolloff in dB / octave.</summary>
+        </member>
+        <member name="P:Cavern.QuickEQ.Equalizer.SubsonicFilter">
+            <summary>Cut off low frequencies that are out of the channel's frequency range.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.AddBand(Cavern.QuickEQ.Equalizer.Band)">
+            <summary>Add a new band to the EQ.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.RemoveBand(Cavern.QuickEQ.Equalizer.Band)">
+            <summary>Remove a band from the EQ.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.ClearBands">
+            <summary>Reset this EQ.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.Visualize(System.Single,System.Single,System.Int32)">
+            <summary>Shows the EQ curve in a logarithmically scaled frequency axis.</summary>
+            <param name="StartFreq">Frequency at the beginning of the curve</param>
+            <param name="EndFreq">Frequency at the end of the curve</param>
+            <param name="Length">Points on the curve</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.Apply(System.Single[],System.Single,System.Single)">
+            <summary>Shows the resulting frequency response if this EQ is applied.</summary>
+            <param name="Response">Frequency response curve to apply the EQ on, from
+            <see cref="M:Cavern.QuickEQ.Measurements.ConvertToGraph(System.Single[],System.Single,System.Single,System.Int32,System.Int32)"/></param>
+            <param name="StartFreq">Frequency at the beginning of the curve</param>
+            <param name="EndFreq">Frequency at the end of the curve</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.CorrectResponse(System.Single[],System.Int32,System.Single[],System.Single,System.Single)">
+            <summary>Generate an equalizer setting to flatten the received response with bands separated in given octavess.</summary>
+            <param name="Response">Frequency response to equalize, must be in decibels (use <see cref="M:Cavern.QuickEQ.Measurements.ConvertToDecibels(System.Single[])"/>),
+            and smoothing (<see cref="M:Cavern.QuickEQ.Measurements.SmoothResponse(System.Single[],System.Int32,System.Single)"/>) is strongly recommended, but the only allowed range is 0 to
+            sample rate / 2</param>
+            <param name="SampleRate">Measurement sampling rate</param>
+            <param name="ReferenceCurve">Match the frequency response to this linear curve of any length, one value means a flat response</param>
+            <param name="Resolution">Band diversity in octaves</param>
+            <param name="MaxGain">Maximum gain of any generated band</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.CorrectGraph(System.Single[],System.Single,System.Single,System.Single[],System.Single,System.Single)">
+            <summary>Generate an equalizer setting to flatten the processed response of
+            <see cref="M:Cavern.QuickEQ.Measurements.SmoothGraph(System.Single[],System.Single,System.Single,System.Single)"/>.</summary>
+            <param name="Graph">Graph to equalize, a pre-applied smoothing (<see cref="M:Cavern.QuickEQ.Measurements.SmoothGraph(System.Single[],System.Single,System.Single,System.Single)"/> is
+            strongly recommended</param>
+            <param name="StartFreq">Frequency at the beginning of the graph</param>
+            <param name="EndFreq">Frequency at the end of the graph</param>
+            <param name="ReferenceCurve">Match the frequency response to this logarithmic curve of any length, one value means a flat response</param>
+            <param name="Resolution">Band diversity in octaves</param>
+            <param name="MaxGain">Maximum gain of any generated band</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Equalizer.AutoCorrectGraph(System.Single[],System.Single,System.Single,System.Single[],System.Single)">
+            <summary>Generate a precise equalizer setting to flatten the processed response of
+            <see cref="M:Cavern.QuickEQ.Measurements.SmoothGraph(System.Single[],System.Single,System.Single,System.Single)"/>.</summary>
+            <param name="Graph">Graph to equalize, a pre-applied smoothing (<see cref="M:Cavern.QuickEQ.Measurements.SmoothGraph(System.Single[],System.Single,System.Single,System.Single)"/> is
+            strongly recommended</param>
+            <param name="StartFreq">Frequency at the beginning of the graph</param>
+            <param name="EndFreq">Frequency at the end of the graph</param>
+            <param name="ReferenceCurve">Match the frequency response to this logarithmic curve of any length, one value means a flat response</param>
+            <param name="MaxGain">Maximum gain of any generated band</param>
+        </member>
+        <member name="T:Cavern.QuickEQ.VerboseImpulseResponse">
+            <summary>Contains an impulse response and data that can be calculated from it.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.VerboseImpulseResponse.ComplexResponse">
+            <summary>Raw impulse response on the complex plane.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.VerboseImpulseResponse.Response">
+            <summary>Raw impulse response samples.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.VerboseImpulseResponse.Polarity">
+            <summary>Impulse polarity, true if positive.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.VerboseImpulseResponse.Delay">
+            <summary>Response delay in samples relative to the reference it was calculated from.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.VerboseImpulseResponse.#ctor(Cavern.QuickEQ.Complex[])">
+            <summary>Create a verbose impulse response from a precalculated impulse response.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.VerboseImpulseResponse.#ctor(System.Single[],System.Single[])">
+            <summary>Create a verbose impulse response from a reference signal and a recorded response.</summary>
+        </member>
+        <member name="T:Cavern.QuickEQ.Window">
+            <summary>Available FFT windows.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.Disabled">
+            <summary>No windowing.</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.Rectangular">
+            <summary>1</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.Sine">
+            <summary>sin(x)</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.Hamming">
+            <summary>0.54 - 0.46 * cos(x)</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.Hann">
+            <summary>0.5 * (1 - cos(x))</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.Blackman">
+            <summary>0.42 - 0.5 * cos(x) + 0.08 * cos(2 * x)</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.BlackmanHarris">
+            <summary>0.35875 - 0.48829 * cos(x) + 0.14128 * cos(2 * x) - 0.01168 * cos(3 * x)</summary>
+        </member>
+        <member name="F:Cavern.QuickEQ.Window.Tukey">
+            <summary>A window for impulse response trimming, with a precompiled alpha.</summary>
+        </member>
+        <member name="T:Cavern.QuickEQ.Windowing">
+            <summary>FFT windowing functions.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.ApplyWindow(System.Single[],Cavern.QuickEQ.Window)">
+            <summary>Apply a predefined window function on a signal.</summary>
+            <param name="Samples">Measurement to window</param>
+            <param name="Function">Windowing function applied</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.ApplyWindow(System.Single[],Cavern.QuickEQ.Window,Cavern.QuickEQ.Window,System.Int32,System.Int32,System.Int32)">
+            <summary>Apply a custom window function on part of a signal.</summary>
+            <param name="Samples">Measurement to window</param>
+            <param name="Left">Window function left from the marker</param>
+            <param name="Right">Window function right from the marker</param>
+            <param name="Start">Beginning of the window in samples</param>
+            <param name="Splitter">The point where the two window functions change</param>
+            <param name="End">End of the window in samples</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.ApplyWindow(Cavern.QuickEQ.Complex[],Cavern.QuickEQ.Window)">
+            <summary>Apply a predefined window function on a signal.</summary>
+            <param name="Samples">Measurement to window</param>
+            <param name="Function">Windowing function applied</param>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.ApplyWindow(Cavern.QuickEQ.Complex[],Cavern.QuickEQ.Window,Cavern.QuickEQ.Window,System.Int32,System.Int32,System.Int32)">
+            <summary>Apply a custom window function on part of a signal.</summary>
+            <param name="Samples">Measurement to window</param>
+            <param name="Left">Window function left from the marker</param>
+            <param name="Right">Window function right from the marker</param>
+            <param name="Start">Beginning of the window in samples</param>
+            <param name="Splitter">The point where the two window functions change</param>
+            <param name="End">End of the window in samples</param>
+        </member>
+        <member name="T:Cavern.QuickEQ.Windowing.WindowFunction">
+            <summary>Window function format.</summary>
+            <param name="x">The position in the signal from 0 to 2 * pi</param>
+            <returns>The multiplier for the sample at x</returns>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.GetWindowFunction(Cavern.QuickEQ.Window)">
+            <summary>Get the corresponding window function for each <see cref="T:Cavern.QuickEQ.Window"/> value.</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.SineWindow(System.Single)">
+            <summary>sin(x)</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.HammingWindow(System.Single)">
+            <summary>0.54 - 0.46 * cos(x)</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.HannWindow(System.Single)">
+            <summary>0.5 * (1 - cos(x))</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.BlackmanWindow(System.Single)">
+            <summary>0.42 - 0.5 * cos(x) + 0.08 * cos(2 * x)</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.BlackmanHarrisWindow(System.Single)">
+            <summary>0.35875 - 0.48829 * cos(x) + 0.14128 * cos(2 * x) - 0.01168 * cos(3 * x)</summary>
+        </member>
+        <member name="M:Cavern.QuickEQ.Windowing.TukeyWindow(System.Single)">
+            <summary>A window for impulse response trimming, with a precompiled alpha.</summary>
         </member>
         <member name="T:Cavern.Cavernize">
             <summary>Adds height to each channel of a regular surround mix.</summary>
@@ -826,6 +1235,9 @@
         <member name="P:Cavern.Channel.CubicalPos">
             <summary>Position on a cube with a side length of 2.</summary>
         </member>
+        <member name="P:Cavern.Channel.SpatialPos">
+            <summary>Position in space. <see cref="P:Cavern.Channel.SphericalPos"/> in Studio environments, <see cref="P:Cavern.Channel.CubicalPos"/> otherwise.</summary>
+        </member>
         <member name="P:Cavern.Channel.Rotation">
             <summary>Rotation direction of the channel.</summary>
         </member>
@@ -846,6 +1258,9 @@
             <param name="Y">Rotation around the Y axis</param>
             <param name="LFE">True for channels carrying only Low Frequency Effects</param>
         </member>
+        <member name="M:Cavern.Channel.IsScreenChannel">
+            <summary>Returns if this channel is part of the screen channels.</summary>
+        </member>
         <member name="M:Cavern.Channel.Recalculate">
             <summary>Recalculates properties and symmetry when a channel's position is changed.</summary>
         </member>
@@ -859,6 +1274,22 @@
             <summary>Window dimension, name, and custom variable setup.</summary>
         </member>
         <member name="M:Cavern.Debug.ArrayLevels.Draw(System.Int32)">
+            <summary>Draw window contents.</summary>
+            <param name="wID">Window ID</param>
+        </member>
+        <member name="T:Cavern.Debug.LogDisplay">
+            <summary>Displays the last logged message.</summary>
+        </member>
+        <member name="F:Cavern.Debug.LogDisplay.LogLevel">
+            <summary>Maximum level to be reported.</summary>
+        </member>
+        <member name="F:Cavern.Debug.LogDisplay.LastLog">
+            <summary>Last received log message that matches the criteria.</summary>
+        </member>
+        <member name="M:Cavern.Debug.LogDisplay.Setup">
+            <summary>Window dimension, name, and custom variable setup.</summary>
+        </member>
+        <member name="M:Cavern.Debug.LogDisplay.Draw(System.Int32)">
             <summary>Draw window contents.</summary>
             <param name="wID">Window ID</param>
         </member>
@@ -981,7 +1412,7 @@
              Lowest quality: forced maximum performance by disabling some features.
             
              Doppler effect and pitch shifting: No.
-             Resampling quality: Low.
+             Resampling quality: Low (nearest neighbour).
              Channels mixed to 3D space: First.
              Panning: Constant gain.
              Accurate angle calculation in asymmetric mode: No.
@@ -993,7 +1424,7 @@
              Medium quality: maximum performance with all features enabled.
             
              Doppler effect and pitch shifting: Low quality.
-             Resampling quality: Low.
+             Resampling quality: Low (nearest neighbour).
              Channels mixed to 3D space: First.
              Panning: Constant gain.
              Accurate angle calculation in asymmetric mode: No.
@@ -1005,7 +1436,7 @@
              High quality: maximum quality except for heavy features.
             
              Doppler effect and pitch shifting: High quality.
-             Resampling quality: High.
+             Resampling quality: Medium (linear interpolation).
              Channels mixed to 3D space: All.
              Panning: Approximated constant power.
              Accurate angle calculation in asymmetric mode: Yes.
@@ -1017,7 +1448,7 @@
              Perfect quality: maximum quality for all features.
             
              Doppler effect and pitch shifting: High quality.
-             Resampling quality: High.
+             Resampling quality: High (Catmull-Rom).
              Channels mixed to 3D space: All.
              Panning: Constant power.
              Accurate angle calculation in asymmetric mode: Yes.
@@ -1044,7 +1475,7 @@
         </member>
         <member name="F:Cavern.Environments.Studio">
             <summary>
-            For a single listener on the center with speakers placed around in a sphere.<br />
+            For a single listener in the center with speakers placed around in a sphere.<br />
             <b>Symmetric engine</b>: balance-based.<br />
             <b>Asymmetric engine</b>: hybrid directional.
             </summary>
@@ -1231,6 +1662,34 @@
         <member name="F:Cavern.Helpers.ScaleByGain.Scale">
             <summary>Actual scaling value.</summary>
         </member>
+        <member name="T:Cavern.Spoofer.AudioListenerSpoofer">
+            <summary>Converts a regular <see cref="T:UnityEngine.AudioListener"/> to Cavern's <see cref="T:Cavern.AudioListener3D"/>.</summary>
+        </member>
+        <member name="F:Cavern.Spoofer.AudioListenerSpoofer.Source">
+            <summary>Listener to spoof.</summary>
+        </member>
+        <member name="F:Cavern.Spoofer.AudioListenerSpoofer.Duality">
+            <summary>Use Unity's audio engine for clips that are not transferrable to Cavern (transferred from <see cref="T:Cavern.Spoofer.AutoSpoofer"/>).</summary>
+        </member>
+        <member name="T:Cavern.Spoofer.AudioSourceSpoofer">
+            <summary>Converts a regular <see cref="T:UnityEngine.AudioSource"/> to Cavern's <see cref="T:Cavern.AudioSource3D"/>.</summary>
+        </member>
+        <member name="F:Cavern.Spoofer.AudioSourceSpoofer.Source">
+            <summary>Source to spoof.</summary>
+        </member>
+        <member name="F:Cavern.Spoofer.AudioSourceSpoofer.Duality">
+            <summary>Use Unity's audio engine for clips that are not transferrable to Cavern (transferred from <see cref="T:Cavern.Spoofer.AutoSpoofer"/>).</summary>
+        </member>
+        <member name="T:Cavern.Spoofer.AutoSpoofer">
+            <summary>Automatically replaces Unity Audio with Cavern on the fly.</summary>
+        </member>
+        <member name="F:Cavern.Spoofer.AutoSpoofer.Duality">
+            <summary>Use Unity's audio engine for clips that are not transferrable to Cavern (anything that is not decompressed on load).</summary>
+        </member>
+        <member name="M:Cavern.Spoofer.AutoSpoofer.CreateSpoofer(System.Boolean)">
+            <summary>Create an <see cref="T:Cavern.Spoofer.AutoSpoofer"/> through the application if it doesn't exist.</summary>
+            <param name="Debug">Display <see cref="T:Cavern.Debug.Levels"/> in the application.</param>
+        </member>
         <member name="T:Cavern.CavernUtilities">
             <summary>Useful functions used in multiple classes.</summary>
         </member>
@@ -1240,13 +1699,13 @@
         <member name="P:Cavern.CavernUtilities.Info">
             <summary>Version and creator information.</summary>
         </member>
-        <member name="F:Cavern.CavernUtilities.halfPi">
+        <member name="F:Cavern.CavernUtilities.HalfPi">
             <summary>pi / 2</summary>
         </member>
-        <member name="F:Cavern.CavernUtilities.sqrt2p2">
+        <member name="F:Cavern.CavernUtilities.Sqrt2p2">
             <summary>sqrt(2) / 2</summary>
         </member>
-        <member name="F:Cavern.CavernUtilities.sqrt2pm2">
+        <member name="F:Cavern.CavernUtilities.Sqrt2pm2">
             <summary>sqrt(2) / -2</summary>
         </member>
         <member name="M:Cavern.CavernUtilities.PlaceInSphere(UnityEngine.Vector3)">
@@ -1261,11 +1720,6 @@
             <param name="Count">Array length</param>
             <param name="Value">Value to check</param>
             <returns>If an array contains the value</returns>
-        </member>
-        <member name="M:Cavern.CavernUtilities.ArrayMaximum(System.Single[],System.Int32)">
-            <summary>Quickly gets the maximum value from an array.</summary>
-            <param name="Target">Array reference</param>
-            <param name="Count">Array length</param>
         </member>
         <member name="M:Cavern.CavernUtilities.BottomlistHandler(System.Single[],System.Int32,System.Single)">
             <summary>Keeps a value in the given array, if it's smaller than any of its contents.</summary>
@@ -1283,7 +1737,7 @@
             <summary>Get the peak amplitude of a single-channel array.</summary>
             <param name="Target">Array reference</param>
             <param name="Samples">Sample count</param>
-            <returns>Maximum absolute value in the array</returns>
+            <returns>Peak amplitude in the array in decibels</returns>
         </member>
         <member name="M:Cavern.CavernUtilities.GetPeak(System.Single[],System.Int32,System.Int32,System.Int32)">
             <summary>Get the peak amplitude of a given channel in a multichannel array.</summary>
@@ -1297,21 +1751,6 @@
             <summary>Vector scaling by each axis.</summary>
             <param name="Target">Input vector</param>
             <param name="Scale">Scale</param>
-        </member>
-        <member name="M:Cavern.CavernUtilities.Lowpass(System.Single[],System.Single@,System.Int32,System.Int32,System.Int32)">
-            <summary>Low-pass filter for a single channel in a multichannel array.</summary>
-            <param name="Target">Sample array reference</param>
-            <param name="Last">Last sample</param>
-            <param name="Samples">Sample count per channel</param>
-            <param name="Channel">Channel</param>
-            <param name="Channels">Channels</param>
-        </member>
-        <member name="M:Cavern.CavernUtilities.Lowpass(System.Single[],System.Single@,System.Int32,System.Single)">
-            <summary>Low-pass with configurable effect strength and no volume correction.</summary>
-            <param name="Target">Sample array reference</param>
-            <param name="Last">Last sample</param>
-            <param name="Samples">Array length</param>
-            <param name="Strength">Effect strength</param>
         </member>
         <member name="M:Cavern.CavernUtilities.Gain(System.Single[],System.Int32,System.Single)">
             <summary>Multiplies all values in an array.</summary>
@@ -1333,11 +1772,6 @@
             <param name="To">Stream</param>
             <param name="Length">Sample count</param>
         </member>
-        <member name="M:Cavern.CavernUtilities.Abs(System.Single)">
-            <summary>Fast absolute value of a float.</summary>
-            <param name="x">Input</param>
-            <returns>Math.Abs(x), just faster</returns>
-        </member>
         <member name="M:Cavern.CavernUtilities.SignalToDb(System.Single)">
             <summary>
             Converts a signal strength (ref = 1) to dB.
@@ -1347,6 +1781,29 @@
             <summary>
             Converts a dB value (ref = 0) to signal strength.
             </summary>
+        </member>
+        <member name="T:Cavern.Utilities.Lowpass">
+            <summary>Simple first-order lowpass filter.</summary>
+        </member>
+        <member name="F:Cavern.Utilities.Lowpass.SampleRate">
+            <summary>Cached sample rate.</summary>
+        </member>
+        <member name="F:Cavern.Utilities.Lowpass.CenterFreq">
+            <summary>Center frequency (-3 dB point) of the filter.</summary>
+        </member>
+        <member name="F:Cavern.Utilities.Lowpass.Q">
+            <summary>Q-factor of the filter.</summary>
+        </member>
+        <member name="M:Cavern.Utilities.Lowpass.Reset(System.Single,System.Single)">
+            <summary>Regenerate the transfer function.</summary>
+            <param name="CenterFreq">Center frequency (-3 dB point) of the filter</param>
+            <param name="Q">Q-factor of the filter</param>
+        </member>
+        <member name="M:Cavern.Utilities.Lowpass.Process(System.Single[],System.Int32,System.Int32)">
+            <summary>Apply this filter to an array of samples. One filter should be applied to only one continuous stream of samples.</summary>
+            <param name="Samples">Input samples</param>
+            <param name="Channel">Channel to filter</param>
+            <param name="Channels">Total channels</param>
         </member>
         <member name="T:Cavern.Utilities.OneShotDestructor">
             <summary>Destructs a one-shot <see cref="T:Cavern.AudioSource3D"/> after it finishes playback.</summary>

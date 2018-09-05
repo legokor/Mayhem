@@ -124,6 +124,7 @@ namespace Helpers {
         /// </summary>
         void Awake() {
             Settings.LeapSetup();
+            AudioListener3D.EnvironmentSize = new Vector3(100, 100, 100);
         }
 
         /// <summary>
