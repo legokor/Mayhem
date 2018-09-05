@@ -12,10 +12,8 @@ namespace Enemies {
     /// </summary>
     [RequireComponent(typeof(AudioSource3D))]
     public abstract class EnemyBase : MonoBehaviour {
-        [Tooltip("Each shot that hits the player removes this much health.")]
-        public int Damage = 3;
-        [Tooltip("The damage this enemy can take before dying.")]
-        public int Health = 10;
+        [Tooltip("The damage this enemy can take before dying. The Map Handler will increase this value over time.")]
+        public int Health = 1;
         [Tooltip("Movement direction.")]
         public Vector2 Movement = new Vector2(0, 5);
         [Tooltip("The weapon kind this enemy is using.")]
@@ -25,11 +23,21 @@ namespace Enemies {
         [Tooltip("The rare loot this unit can drop.")]
         public GameObject[] RareDrops;
 
-        /// <summary>Is u ded?</summary>
+        /// <summary>
+        /// Is u ded?
+        /// </summary>
         bool Dead = false;
-        /// <summary>Time until the next shot.</summary>
+        /// <summary>
+        /// Time until the next shot.
+        /// </summary>
         float Cooldown;
-        /// <summary>Audio source component.</summary>
+        /// <summary>
+        /// Single shot damage, set on spawn by map advancement.
+        /// </summary>
+        int Damage;
+        /// <summary>
+        /// Audio source component.
+        /// </summary>
         AudioSource3D Source;
 
         /// <summary>
@@ -43,9 +51,9 @@ namespace Enemies {
         protected virtual void HandleSpecialMovement() { }
 
         /// <summary>
-        /// Returns a projectile which this kind of enemy shoots.
+        /// Returns the projectiles which this kind of enemy shoots.
         /// </summary>
-        protected abstract Projectile Shoot();
+        protected abstract Projectile[] Shoot();
 
         /// <summary>
         /// Returns where the loot should spawn if the enemy is killed.
@@ -55,11 +63,18 @@ namespace Enemies {
         }
 
         /// <summary>
+        /// Create the same projectile the player can shoot.
+        /// </summary>
+        protected Projectile CreateProjectile(Vector3 Position, Quaternion Rotation) {
+            return Instantiate(PlayerEntity.Instance.ProjectileEntity, Position, Rotation).GetComponent<Projectile>();
+        }
+
+        /// <summary>
         /// When the enemy is spawned, set it up.
         /// </summary>
         void Start() {
             Damage = MapHandler.Instance.EnemyDamage;
-            Health = MapHandler.Instance.EnemyHealth;
+            Health = MapHandler.Instance.EnemyHealth * Health;
             Source = GetComponent<AudioSource3D>();
             if (!Settings.HQAudio)
                 Source.Mute = true;
@@ -77,11 +92,13 @@ namespace Enemies {
             if (WeaponKind != WeaponKinds.Unassigned) { // Only when the weapon is assigned
                 Cooldown -= Time.deltaTime;
                 if (Cooldown <= 0 && Camera.main.WorldToViewportPoint(transform.position).y > 0) {
-                    Projectile projectile = Shoot();
-                    projectile.Damage = Damage;
-                    projectile.Speed = 75;
-                    projectile.WeaponKind = WeaponKind;
-                    projectile.Repaint(WeaponBase.WeaponKindColor(WeaponKind));
+                    Projectile[] Projectiles = Shoot();
+                    for (int i = 0, c = Projectiles.Length; i < c; ++i) {
+                        Projectiles[i].Damage = Damage;
+                        Projectiles[i].Speed = 75;
+                        Projectiles[i].WeaponKind = WeaponKind;
+                        Projectiles[i].Repaint(WeaponBase.WeaponKindColor(WeaponKind));
+                    }
                     if (!Source.Mute)
                         Source.Play();
                     Cooldown += ShootingSpeed;

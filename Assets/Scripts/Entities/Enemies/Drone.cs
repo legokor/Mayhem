@@ -26,10 +26,10 @@ namespace Enemies {
             LastX = NewX;
         }
 
-        protected override Projectile Shoot() {
+        protected override Projectile[] Shoot() {
             Vector3 Direction = PlayerEntity.Instance.transform.position + new Vector3(0, 0,
                 Mathf.Pow(Vector3.Distance(PlayerEntity.Instance.transform.position, transform.position), .775f)) - transform.position;
-            return Instantiate(PlayerEntity.Instance.ProjectileEntity, transform.position, Quaternion.LookRotation(Direction)).GetComponent<Projectile>();
+            return new Projectile[] { CreateProjectile(transform.position, Quaternion.LookRotation(Direction)) };
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 using Enemies;
 using Menus;
 
-using Random = UnityEngine.Random;
+using Cavern;
 
 namespace Helpers {
     /// <summary>
@@ -42,6 +43,8 @@ namespace Helpers {
         public int FightersPerWave = 20;
         [Tooltip("Dronw spawn. Don't set if you don't want drones on this level.")]
         public GameObject EnemyDrone;
+        [Tooltip("Boss spawn. Spawned every 10000 points. Don't set if you don't want boss fight on this level.")]
+        public GameObject EnemyBoss;
         [Tooltip("This many drones to spawn per wave.")]
         public int DronesPerWave = 6;
         [Tooltip("Time between creating new waves.")]
@@ -54,12 +57,16 @@ namespace Helpers {
         /// <summary>
         /// Scrolled distance.
         /// </summary>
-        [System.NonSerialized] public float MapPos = 0;
+        public float MapPos { get; private set; } = 0;
 
         /// <summary>
         /// Previous environment filling.
         /// </summary>
         bool[,] LastFilling = new bool[40, 30];
+        /// <summary>
+        /// Score / 10000 the last time. If increased, a boss is spawned.
+        /// </summary>
+        int LastBoss = 0;
         /// <summary>
         /// Current spawn block.
         /// </summary>
@@ -140,7 +147,7 @@ namespace Helpers {
             } else {
                 Camera.main.transform.position = new Vector3(0, 150, MapPos); // Camera movement
             }
-            transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Round(MapPos / 100) * 100); // Drag the ground along, don't spawn new lands
+            transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Round(MapPos / 100) * 100); // Drag the ground along
             Difficulty += Time.deltaTime / 10f; // Increase difficulty
             // Environment spawning
             int GroundStep = (int)(MapPos / 100);
@@ -208,12 +215,14 @@ namespace Helpers {
                 if (Vegetation != null && Vegetation.Length != 0) {
                     for (int i = 0; i < 50; ++i) {
                         float WidthPos = Random.Range(-60f, 60f);
-                        Instantiate(Vegetation[Random.Range(0, Vegetation.Length)], new Vector3(WidthPos + Mathf.Sign(WidthPos) * 100, 0, SpawnDistance + Random.value * 100),
+                        Instantiate(Vegetation[Random.Range(0, Vegetation.Length)],
+                            new Vector3(WidthPos + Mathf.Sign(WidthPos) * 100, 0, SpawnDistance + Random.value * 100),
                             Quaternion.Euler(0, Random.value * 360, 0));
                     }
                 }
             }
             // Create enemies
+            float EnemyHeight = PlayerEntity.Instance.transform.position.y;
             NextWave -= Time.deltaTime;
             if (NextWave <= 0) {
                 if (EnemyFighters.Length != 0) { // Fighters
@@ -224,13 +233,15 @@ namespace Helpers {
                         Distance += 10;
                         switch (WaveKind) {
                             case 0: // Group from left
-                                Instantiate(FighterSpawn, new Vector3(-Distance, 25, MapPos + Distance), Utilities.Backwards).GetComponent<Fighter>().Movement.x = -35;
+                                Instantiate(FighterSpawn, new Vector3(-Distance, EnemyHeight, MapPos + Distance),
+                                    Utilities.Backwards).GetComponent<Fighter>().Movement.x = -35;
                                 break;
                             case 1: // Group from right
-                                Instantiate(FighterSpawn, new Vector3(Distance, 25, MapPos + Distance), Utilities.Backwards).GetComponent<Fighter>().Movement.x = 35;
+                                Instantiate(FighterSpawn, new Vector3(Distance, EnemyHeight, MapPos + Distance),
+                                    Utilities.Backwards).GetComponent<Fighter>().Movement.x = 35;
                                 break;
                             default: // Random formation with the highest chance
-                                Instantiate(FighterSpawn, new Vector3(Random.Range(-75, 76), 25, MapPos + Distance), Utilities.Backwards);
+                                Instantiate(FighterSpawn, new Vector3(Random.Range(-75, 76), EnemyHeight, MapPos + Distance), Utilities.Backwards);
                                 break;
                         }
                     }
@@ -242,15 +253,24 @@ namespace Helpers {
                         Distance += 10;
                         switch (WaveKind) {
                             case 0: // Random formation
-                                Instantiate(EnemyDrone, new Vector3(Random.Range(-75, 76), 25, MapPos + Distance), Utilities.Backwards);
+                                Instantiate(EnemyDrone, new Vector3(Random.Range(-75, 76), EnemyHeight, MapPos + Distance), Utilities.Backwards);
                                 break;
                             case 1: // Two columns
-                                Instantiate(EnemyDrone, new Vector3(i % 2 == 1 ? -50 : 50, 25, MapPos + Distance + (i % 2 == 1 ? -25 : 0)), Utilities.Backwards);
+                                Instantiate(EnemyDrone, new Vector3(i % 2 == 1 ? -50 : 50, EnemyHeight, MapPos + Distance + (i % 2 == 1 ? -25 : 0)),
+                                    Utilities.Backwards);
                                 break;
                         }
                     }
                 }
                 NextWave += WaveCountdown;
+            }
+            // Create bosses
+            if (EnemyBoss) {
+                int CurrentBoss = PlayerEntity.Instance.Score / 10000;
+                if (CurrentBoss != LastBoss) {
+                    Instantiate(EnemyBoss, new Vector3(0, 25, MapPos + 100), Utilities.Backwards);
+                    LastBoss = CurrentBoss;
+                }
             }
         }
     }

@@ -14,8 +14,10 @@ namespace Enemies {
             transform.rotation = Quaternion.Euler(0, 180, -Movement.x * .5f);
         }
 
-        protected override Projectile Shoot() {
-            return Instantiate(PlayerEntity.Instance.ProjectileEntity, transform.position + transform.forward * NoseOffset, Quaternion.Euler(0, 180, 0)).GetComponent<Projectile>();
+        protected override Projectile[] Shoot() {
+            return new Projectile[] {
+                CreateProjectile(transform.position + transform.forward * NoseOffset, Quaternion.Euler(0, 180, 0))
+            };
         }
     }
 }

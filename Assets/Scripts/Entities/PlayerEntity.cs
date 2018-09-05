@@ -33,11 +33,13 @@ public class PlayerEntity : Singleton<PlayerEntity> {
         SidePos = 0,
         SinceSpawn = 3;
 
-    int Lives = 3, Score = -50;
+    int Lives = 3;
+
+    public int Score { get; private set; } = -50;
 
     Texture2D GUIColor, GUITransparency;
 
-    const float AreaWidth = 160, AreaHeight = 110, AreaWMax = AreaWidth * .5f, AreaWMin = -AreaWMax, AreaHMax = AreaHeight * .5f, AreaHMin = -AreaHMax;
+    public const float AreaWidth = 160, AreaHeight = 110, AreaWMax = AreaWidth * .5f, AreaWMin = -AreaWMax, AreaHMax = AreaHeight * .5f, AreaHMin = -AreaHMax;
 
     public void AwardScore(int Score) {
         this.Score += Score;
