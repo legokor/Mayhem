@@ -14,7 +14,7 @@ namespace Enemies {
 
         protected override void HandleSpecialMovement() {
             transform.position = new Vector3(Mathf.Sin(TimeAlive * Mathf.PI * .15f) * PlayerEntity.AreaWMax, PlayerEntity.Instance.transform.position.y,
-                MapHandler.Instance.MapPos + Mathf.Lerp(PlayerEntity.AreaHMax * 3, PlayerEntity.AreaHMax - 3 * transform.localScale.x, TimeAlive));
+                MapHandler.Instance.MapPos + Mathf.Lerp(PlayerEntity.AreaHMax * 1.5f, PlayerEntity.AreaHMax - 3 * transform.localScale.x, TimeAlive));
             TimeAlive += Time.deltaTime;
         }
 
